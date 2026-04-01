@@ -8,7 +8,23 @@ Your backend is a **FastAPI-based discussion thread management service** designe
 
 #### 1. Service Health & Discovery
 - **Health Check** (`GET /`) - Verifies service status
+  
+  **Example Response:**
+  ```json
+  {
+    "status": "ok",
+    "service": "discussion-thread-backend"
+  }
+  ```
+
 - **Dataset Discovery** (`GET /datasets`) - Lists all available datasets from the `data/` directory
+  
+  **Example Response:**
+  ```json
+  {
+    "datasets": ["discussion_demo", "course_forum", "slack_archive"]
+  }
+  ```
 
 #### 2. Message Loading & Validation
 The `loader.py` module handles dataset loading with the following behaviors:
@@ -20,7 +36,94 @@ The `loader.py` module handles dataset loading with the following behaviors:
 
 #### 3. Two Data Retrieval Endpoints
 - **`GET /discussions/{dataset_id}/messages`** - Returns flat list of all messages with metadata
+  
+  **Example Response:**
+  ```json
+  {
+    "datasetId": "discussion_demo",
+    "messageCount": 3,
+    "messages": [
+      {
+        "id": "msg1",
+        "author": "Alice",
+        "timestamp": "2024-01-15T10:30:00",
+        "text": "What do you think about the new proposal?",
+        "parentId": null,
+        "topic": "proposals",
+        "sentiment": "neutral"
+      },
+      {
+        "id": "msg2",
+        "author": "Bob",
+        "timestamp": "2024-01-15T11:00:00",
+        "text": "I think it's a great idea!",
+        "parentId": "msg1",
+        "topic": "proposals",
+        "sentiment": "positive"
+      },
+      {
+        "id": "msg3",
+        "author": "Carol",
+        "timestamp": "2024-01-15T11:30:00",
+        "text": "I have some concerns.",
+        "parentId": "msg1",
+        "topic": "proposals",
+        "sentiment": "negative"
+      }
+    ],
+    "warnings": []
+  }
+  ```
+
 - **`GET /discussions/{dataset_id}/thread`** - Returns hierarchical thread structure with statistics
+  
+  **Example Response:**
+  ```json
+  {
+    "datasetId": "discussion_demo",
+    "roots": [
+      {
+        "id": "msg1",
+        "author": "Alice",
+        "timestamp": "2024-01-15T10:30:00",
+        "text": "What do you think about the new proposal?",
+        "parentId": null,
+        "topic": "proposals",
+        "sentiment": "neutral",
+        "children": [
+          {
+            "id": "msg2",
+            "author": "Bob",
+            "timestamp": "2024-01-15T11:00:00",
+            "text": "I think it's a great idea!",
+            "parentId": "msg1",
+            "topic": "proposals",
+            "sentiment": "positive",
+            "children": []
+          },
+          {
+            "id": "msg3",
+            "author": "Carol",
+            "timestamp": "2024-01-15T11:30:00",
+            "text": "I have some concerns.",
+            "parentId": "msg1",
+            "topic": "proposals",
+            "sentiment": "negative",
+            "children": []
+          }
+        ]
+      }
+    ],
+    "orphans": [],
+    "stats": {
+      "messageCount": 3,
+      "rootCount": 1,
+      "orphanCount": 0,
+      "maxDepth": 2
+    },
+    "warnings": []
+  }
+  ```
 
 #### 4. Thread Tree Construction
 The `parser.py` module builds a parent-child hierarchy from flat messages:
