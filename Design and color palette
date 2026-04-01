@@ -1,1 +1,62 @@
 Design and color palette V1
+ Color System
+#1AAD19 (WeChat Green)
+Active/selected week, positive sentiment, node avatars, battery icon
+#2BA245 (Dark Green)
+Supportive badges, secondary emphasis
+#4D4D4D (Dark Gray)
+Critical sentiment labels, secondary text
+#888888 (Medium Gray)
+Timestamps, neutral sentiment, auxiliary info
+#AAAAAA (Light Gray)
+Connection lines, dividers, placeholders
+#F1F1F1 (Very Light Gray)
+Background, chat bubbles, statistic cards
+
+Device Spec
+Device: iPhone 15 Pro Max
+Screen: 393 × 852 px
+Design: Rounded corners (54 px), Dynamic Island
+Status bar: Full system icons (signal, WiFi, battery)
+
+Interaction Design
+Tap a node → bottom sheet slides up (iOS-style detail panel)
+Tap again → sheet collapses
+Week selector updates all views (fully synced)
+Smooth toggle between Thread Map view and Chat view
+
+
+Design and color palette V2
+Color System — Thread Map Interface
+
+#6F8F63 (Primary Sage Green)
+
+Active week tab, selected states, main interaction highlight
+
+#A7B79F (Soft Green)
+
+Chat bubbles, supportive tone background, calm discussion atmosphere
+
+#D6E0D2 (Light Green Tint)
+
+Secondary surfaces, hover states, subtle grouping areas
+
+#3A3A3A (Primary Dark Gray)
+
+Main text, usernames, primary information hierarchy
+
+#7A7A7A (Medium Gray)
+
+Timestamps, metadata, neutral sentiment labels
+
+#BDBDBD (Light Gray)
+
+Dividers, inactive tabs, structural UI boundaries
+
+#EFEFEF (Surface Gray)
+
+App background, panels, card containers
+
+#FFFFFF (Base White)
+
+Message cards, readable content surfaces
