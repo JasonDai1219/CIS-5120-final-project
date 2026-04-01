@@ -1,0 +1,74 @@
+[
+  {
+    "id": "m1",
+    "author": "Alice",
+    "timestamp": "2026-03-01T09:00:00Z",
+    "text": "Should we extend the deadline for the assignment?",
+    "parentId": null,
+    "topic": "deadline",
+    "sentiment": "neutral"
+  },
+  {
+    "id": "m2",
+    "author": "Bob",
+    "timestamp": "2026-03-01T09:10:00Z",
+    "text": "I think yes, because several people are behind.",
+    "parentId": "m1",
+    "topic": "deadline",
+    "sentiment": "supportive"
+  },
+  {
+    "id": "m3",
+    "author": "Carol",
+    "timestamp": "2026-03-01T09:15:00Z",
+    "text": "I disagree. Extending it again might be unfair.",
+    "parentId": "m1",
+    "topic": "deadline",
+    "sentiment": "critical"
+  },
+  {
+    "id": "m4",
+    "author": "Dan",
+    "timestamp": "2026-03-01T09:20:00Z",
+    "text": "Maybe a short extension would be a compromise.",
+    "parentId": "m3",
+    "topic": "deadline",
+    "sentiment": "mixed"
+  },
+  {
+    "id": "m5",
+    "author": "Eve",
+    "timestamp": "2026-03-08T10:00:00Z",
+    "text": "This reminds me of the earlier grading discussion.",
+    "parentId": null,
+    "topic": "grading",
+    "sentiment": "neutral"
+  },
+  {
+    "id": "m6",
+    "author": "Frank",
+    "timestamp": "2026-03-08T10:05:00Z",
+    "text": "Can you clarify what part of grading policy you mean?",
+    "parentId": "m5",
+    "topic": "grading",
+    "sentiment": "neutral"
+  },
+  {
+    "id": "m7",
+    "author": "Grace",
+    "timestamp": "2026-03-08T10:08:00Z",
+    "text": "I think the participation rubric is the main issue.",
+    "parentId": "m6",
+    "topic": "grading",
+    "sentiment": "supportive"
+  },
+  {
+    "id": "m8",
+    "author": "Henry",
+    "timestamp": "2026-03-08T10:10:00Z",
+    "text": "Replying to a missing parent on purpose.",
+    "parentId": "missing_parent",
+    "topic": "grading",
+    "sentiment": "neutral"
+  }
+]
