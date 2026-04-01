@@ -1,4 +1,6 @@
+Please find the Version 1 and Version 2 design prototypes below for reference: 
 https://drive.google.com/drive/folders/1gN43MYE7--jj0NosBL9vvh2nHedRJj4E?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto
+
 
 Design and color palette V1
  Color System
@@ -14,13 +16,11 @@ Timestamps, neutral sentiment, auxiliary info
 Connection lines, dividers, placeholders
 #F1F1F1 (Very Light Gray)
 Background, chat bubbles, statistic cards
-
 Device Spec
 Device: iPhone 15 Pro Max
 Screen: 393 × 852 px
 Design: Rounded corners (54 px), Dynamic Island
 Status bar: Full system icons (signal, WiFi, battery)
-
 Interaction Design
 Tap a node → bottom sheet slides up (iOS-style detail panel)
 Tap again → sheet collapses
