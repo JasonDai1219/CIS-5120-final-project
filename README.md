@@ -2,7 +2,7 @@
 
 ## Backend Functionality & Behavior
 
-Your backend is a **FastAPI-based discussion thread management service** designed to load and parse threaded discussion datasets.
+The backend is a **FastAPI-based discussion thread management service** designed to load and parse threaded discussion datasets.
 
 ### Core Features
 
