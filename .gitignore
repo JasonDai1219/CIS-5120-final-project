@@ -25,3 +25,7 @@ out/
 # Editors
 .vscode/
 .idea/
+
+# Local helper files
+frontend/AGENTS.md
+frontend/CLAUDE.md
