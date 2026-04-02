@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.loader import list_datasets, load_messages
 from app.parser import build_thread_tree
@@ -10,6 +11,14 @@ app = FastAPI(
     title="Discussion Thread Backend",
     version="0.1.0",
     description="Minimal backend for loading and parsing threaded discussion datasets.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
