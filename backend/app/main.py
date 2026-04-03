@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.ai_service import enrich_messages_with_ai, summarize_thread
 from app.loader import list_datasets, load_messages
 from app.parser import build_thread_tree
 from app.schemas import DatasetListResponse, MessagesResponse, ThreadResponse
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Discussion Thread Backend",
@@ -67,3 +72,63 @@ def get_thread(dataset_id: str) -> ThreadResponse:
         stats=stats,
         warnings=warnings,
     )
+
+
+@app.get("/discussions/{dataset_id}/messages/annotated")
+def get_annotated_messages(dataset_id: str) -> dict:
+    """
+    Return messages enriched with AI-generated topic and sentiment annotations.
+    
+    Skips messages that are already fully annotated (topic != 'unknown' AND sentiment != 'unknown').
+    Falls back to keyword-based heuristics if API key is missing or API fails.
+    """
+    try:
+        messages, warnings = load_messages(dataset_id)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    enriched_messages = enrich_messages_with_ai(messages)
+
+    return {
+        "datasetId": dataset_id,
+        "messageCount": len(enriched_messages),
+        "messages": enriched_messages,
+        "warnings": warnings,
+    }
+
+
+@app.get("/discussions/{dataset_id}/ai-summary")
+def get_ai_summary(dataset_id: str) -> dict:
+    """
+    Return AI-generated summaries for each root thread in the dataset.
+    
+    Each summary includes:
+    - root_id: ID of the root message
+    - main_topic: Inferred topic from root message
+    - summary: 1-2 sentence summary of the thread
+    - key_points: List of 3 key discussion points
+    
+    Falls back to keyword-based heuristics if API key is missing or API fails.
+    """
+    try:
+        messages, warnings = load_messages(dataset_id)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    roots, _orphans, _stats = build_thread_tree(messages)
+
+    summaries = []
+    for root in roots:
+        summary = summarize_thread(root, messages)
+        summaries.append(summary)
+
+    return {
+        "datasetId": dataset_id,
+        "summaryCount": len(summaries),
+        "summaries": summaries,
+        "warnings": warnings,
+    }
