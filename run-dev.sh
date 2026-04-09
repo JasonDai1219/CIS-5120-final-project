@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-ROOT="/Users/matijarajkovic/cis4120project"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
 
 echo "Starting backend..."
 osascript -e "tell application \"Terminal\" to do script \"cd $ROOT/backend && source venv/bin/activate && bash run.sh\""
