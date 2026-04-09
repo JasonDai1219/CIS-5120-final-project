@@ -231,7 +231,7 @@ export default function Home() {
     async function loadDatasets() {
       try {
         setError("");
-        const res = await fetch("http://localhost:8000/datasets");
+        const res = await fetch("/api/datasets");
         if (!res.ok) throw new Error(`Failed to load datasets: ${res.status}`);
 
         const data = await res.json();
@@ -257,9 +257,7 @@ export default function Home() {
         setLoading(true);
         setError("");
 
-        const res = await fetch(
-          `http://localhost:8000/discussions/${selectedDataset}/messages`
-        );
+        const res = await fetch(`/api/discussions/${selectedDataset}/messages`)
         if (!res.ok) throw new Error(`Failed to load messages: ${res.status}`);
 
         const data = await res.json();
@@ -303,17 +301,15 @@ export default function Home() {
       <div className="mb-6 flex flex-wrap gap-3">
         <button
           onClick={() => setViewMode("chat")}
-          className={`rounded px-4 py-2 ${
-            viewMode === "chat" ? "bg-black text-white" : "bg-gray-200"
-          }`}
+          className={`rounded px-4 py-2 ${viewMode === "chat" ? "bg-black text-white" : "bg-gray-200"
+            }`}
         >
           Chat View
         </button>
         <button
           onClick={() => setViewMode("graph")}
-          className={`rounded px-4 py-2 ${
-            viewMode === "graph" ? "bg-black text-white" : "bg-gray-200"
-          }`}
+          className={`rounded px-4 py-2 ${viewMode === "graph" ? "bg-black text-white" : "bg-gray-200"
+            }`}
         >
           Graph View
         </button>
@@ -322,25 +318,22 @@ export default function Home() {
       <div className="mb-6 flex flex-wrap gap-3">
         <button
           onClick={() => setTimeFilter("all")}
-          className={`rounded px-4 py-2 ${
-            timeFilter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`rounded px-4 py-2 ${timeFilter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
         >
           All
         </button>
         <button
           onClick={() => setTimeFilter("week1")}
-          className={`rounded px-4 py-2 ${
-            timeFilter === "week1" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`rounded px-4 py-2 ${timeFilter === "week1" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
         >
           Week 1
         </button>
         <button
           onClick={() => setTimeFilter("week2")}
-          className={`rounded px-4 py-2 ${
-            timeFilter === "week2" ? "bg-blue-600 text-white" : "bg-gray-200"
-          }`}
+          className={`rounded px-4 py-2 ${timeFilter === "week2" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
         >
           Week 2
         </button>
@@ -350,17 +343,15 @@ export default function Home() {
         <div className="mb-6 flex flex-wrap gap-3">
           <button
             onClick={() => setGraphMode("message")}
-            className={`rounded px-4 py-2 ${
-              graphMode === "message" ? "bg-purple-600 text-white" : "bg-gray-200"
-            }`}
+            className={`rounded px-4 py-2 ${graphMode === "message" ? "bg-purple-600 text-white" : "bg-gray-200"
+              }`}
           >
             Message Graph
           </button>
           <button
             onClick={() => setGraphMode("topic")}
-            className={`rounded px-4 py-2 ${
-              graphMode === "topic" ? "bg-purple-600 text-white" : "bg-gray-200"
-            }`}
+            className={`rounded px-4 py-2 ${graphMode === "topic" ? "bg-purple-600 text-white" : "bg-gray-200"
+              }`}
           >
             Topic Graph
           </button>
@@ -426,9 +417,8 @@ export default function Home() {
           <div className="mb-3">
             <button
               onClick={() => setSelectedTopic(null)}
-              className={`rounded px-3 py-2 text-sm ${
-                selectedTopic === null ? "bg-black text-white" : "bg-gray-200"
-              }`}
+              className={`rounded px-3 py-2 text-sm ${selectedTopic === null ? "bg-black text-white" : "bg-gray-200"
+                }`}
             >
               All Topics
             </button>
@@ -439,11 +429,10 @@ export default function Home() {
               <button
                 key={topic.topic}
                 onClick={() => setSelectedTopic(topic.topic)}
-                className={`block w-full rounded-lg border p-3 text-left ${
-                  selectedTopic === topic.topic
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white"
-                }`}
+                className={`block w-full rounded-lg border p-3 text-left ${selectedTopic === topic.topic
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-200 bg-white"
+                  }`}
               >
                 <div className="font-medium">{topic.topic}</div>
                 <div className="mt-1 text-sm text-gray-600">
@@ -482,11 +471,10 @@ export default function Home() {
                   <button
                     key={msg.id}
                     onClick={() => setSelectedMessage(msg)}
-                    className={`block w-full rounded-lg border p-3 text-left transition ${
-                      selectedMessage?.id === msg.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 bg-white hover:bg-gray-50"
-                    }`}
+                    className={`block w-full rounded-lg border p-3 text-left transition ${selectedMessage?.id === msg.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                      }`}
                   >
                     <div className="mb-1 flex items-center justify-between">
                       <span className="font-medium">{msg.author}</span>
