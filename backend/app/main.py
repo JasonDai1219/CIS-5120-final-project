@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.ai_service import enrich_messages_with_ai, summarize_thread
 from app.loader import list_datasets, load_messages
 from app.parser import build_thread_tree
-from app.schemas import DatasetListResponse, MessagesResponse, ThreadResponse
+from app.schemas import DatasetListResponse, Message, MessagesResponse, ThreadResponse
 
 logger = logging.getLogger(__name__)
 
@@ -119,11 +119,18 @@ def get_ai_summary(dataset_id: str) -> dict:
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-    roots, _orphans, _stats = build_thread_tree(messages)
+    # First, enrich messages with AI annotations to get topics
+    enriched_dicts = enrich_messages_with_ai(messages)
+    
+    # Convert enriched dicts back to Message objects
+    enriched_messages = [Message(**msg_dict) for msg_dict in enriched_dicts]
+    
+    # Build thread tree from enriched messages
+    roots, _orphans, _stats = build_thread_tree(enriched_messages)
 
     summaries = []
     for root in roots:
-        summary = summarize_thread(root, messages)
+        summary = summarize_thread(root, enriched_messages)
         summaries.append(summary)
 
     return {

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "proj1",
+    "author": "Professor Lee",
+    "timestamp": "2026-03-06T09:00:00Z",
+    "text": "Any questions about the final project requirements?",
+    "parentId": null
+  },
+  {
+    "id": "proj2",
+    "author": "Alice",
+    "timestamp": "2026-03-06T09:20:00Z",
+    "text": "Can we work in groups or must it be individual?",
+    "parentId": "proj1"
+  },
+  {
+    "id": "proj3",
+    "author": "Professor Lee",
+    "timestamp": "2026-03-06T09:30:00Z",
+    "text": "Groups of up to 3 are allowed. Just make sure everyone contributes.",
+    "parentId": "proj2"
+  },
+  {
+    "id": "proj4",
+    "author": "Bob",
+    "timestamp": "2026-03-06T09:40:00Z",
+    "text": "What's the submission format? Code only or with documentation?",
+    "parentId": "proj1"
+  },
+  {
+    "id": "proj5",
+    "author": "Professor Lee",
+    "timestamp": "2026-03-06T09:50:00Z",
+    "text": "Please include a README and comments in your code.",
+    "parentId": "proj4"
+  },
+  {
+    "id": "proj6",
+    "author": "Carol",
+    "timestamp": "2026-03-06T10:00:00Z",
+    "text": "Is there a penalty for late submission?",
+    "parentId": "proj1"
+  },
+  {
+    "id": "proj7",
+    "author": "Professor Lee",
+    "timestamp": "2026-03-06T10:10:00Z",
+    "text": "Yes, 10% deduction per day late. No submissions accepted after 3 days.",
+    "parentId": "proj6"
+  },
+  {
+    "id": "proj8",
+    "author": "Dan",
+    "timestamp": "2026-03-06T10:20:00Z",
+    "text": "Can we use external libraries like TensorFlow?",
+    "parentId": "proj1"
+  },
+  {
+    "id": "proj9",
+    "author": "Professor Lee",
+    "timestamp": "2026-03-06T10:30:00Z",
+    "text": "Yes, external libraries are encouraged. Just document your dependencies.",
+    "parentId": "proj8"
+  }
+]

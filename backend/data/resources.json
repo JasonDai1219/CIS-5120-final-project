@@ -1,0 +1,65 @@
+[
+  {
+    "id": "res1",
+    "author": "Alice",
+    "timestamp": "2026-03-05T11:00:00Z",
+    "text": "Does anyone have good resources for learning about neural networks?",
+    "parentId": null
+  },
+  {
+    "id": "res2",
+    "author": "Bob",
+    "timestamp": "2026-03-05T11:20:00Z",
+    "text": "I found this great tutorial series on YouTube. Very comprehensive.",
+    "parentId": "res1"
+  },
+  {
+    "id": "res3",
+    "author": "Carol",
+    "timestamp": "2026-03-05T11:30:00Z",
+    "text": "The textbook chapter 3 covers it well too.",
+    "parentId": "res1"
+  },
+  {
+    "id": "res4",
+    "author": "Dan",
+    "timestamp": "2026-03-05T11:40:00Z",
+    "text": "I prefer the research papers. They give more depth.",
+    "parentId": "res3"
+  },
+  {
+    "id": "res5",
+    "author": "Eve",
+    "timestamp": "2026-03-05T11:50:00Z",
+    "text": "Papers are difficult. I recommend starting with the tutorial first.",
+    "parentId": "res4"
+  },
+  {
+    "id": "res6",
+    "author": "Frank",
+    "timestamp": "2026-03-07T13:00:00Z",
+    "text": "Does anyone know good open-source libraries for data preprocessing?",
+    "parentId": null
+  },
+  {
+    "id": "res7",
+    "author": "Grace",
+    "timestamp": "2026-03-07T13:15:00Z",
+    "text": "Pandas is the standard choice for most projects.",
+    "parentId": "res6"
+  },
+  {
+    "id": "res8",
+    "author": "Henry",
+    "timestamp": "2026-03-07T13:25:00Z",
+    "text": "For specialized tasks, scikit-learn also has useful utilities.",
+    "parentId": "res7"
+  },
+  {
+    "id": "res9",
+    "author": "Alice",
+    "timestamp": "2026-03-07T13:35:00Z",
+    "text": "I've been using Polars recently. It's faster than Pandas.",
+    "parentId": "res7"
+  }
+]

@@ -31,35 +31,48 @@ function sentimentBadgeClass(sentiment?: string) {
 }
 
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
   const [datasetIds, setDatasetIds] = useState<string[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [aiMessages, setAiMessages] = useState<Message[]>([]);
+  const [aiSummaries, setAiSummaries] = useState<any[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingAI, setLoadingAI] = useState(false);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<"chat" | "graph">("chat");
   const [graphMode, setGraphMode] = useState<"message" | "topic">("message");
   const [timeFilter, setTimeFilter] = useState<"all" | "week1" | "week2">("all");
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const messagesById = useMemo(() => {
-    return Object.fromEntries(messages.map((msg) => [msg.id, msg]));
-  }, [messages]);
+    // 如果有 AI 数据，使用 AI 数据；否则使用原始数据
+    const sourceMessages = aiMessages.length > 0 ? aiMessages : messages;
+    return Object.fromEntries(sourceMessages.map((msg) => [msg.id, msg]));
+  }, [messages, aiMessages]);
 
   const parentMessage = selectedMessage?.parentId
     ? messagesById[selectedMessage.parentId]
     : null;
 
   const filteredMessages = useMemo(() => {
-    if (timeFilter === "all") return messages;
+    // 如果有 AI 数据，优先使用 AI 数据
+    const sourceMessages = aiMessages.length > 0 ? aiMessages : messages;
+    
+    if (timeFilter === "all") return sourceMessages;
     if (timeFilter === "week1") {
-      return messages.filter((msg) => msg.timestamp.startsWith("2026-03-01"));
+      return sourceMessages.filter((msg) => msg.timestamp.startsWith("2026-03-01"));
     }
     if (timeFilter === "week2") {
-      return messages.filter((msg) => msg.timestamp.startsWith("2026-03-08"));
+      return sourceMessages.filter((msg) => msg.timestamp.startsWith("2026-03-08"));
     }
-    return messages;
-  }, [messages, timeFilter]);
+    return sourceMessages;
+  }, [messages, aiMessages, timeFilter]);
 
   const sentimentCounts = useMemo(() => {
     return filteredMessages.reduce(
@@ -256,6 +269,9 @@ export default function Home() {
       try {
         setLoading(true);
         setError("");
+        // 切换数据集时清空 AI 数据
+        setAiMessages([]);
+        setAiSummaries([]);
 
         const res = await fetch(`/api/discussions/${selectedDataset}/messages`)
         if (!res.ok) throw new Error(`Failed to load messages: ${res.status}`);
@@ -274,6 +290,44 @@ export default function Home() {
 
     loadMessages();
   }, [selectedDataset]);
+
+  // 当切换到 Graph View 时自动加载 AI 数据和摘要
+  useEffect(() => {
+    // 只在 Graph View 时加载 AI 数据
+    if (viewMode !== "graph" || !selectedDataset) return;
+
+    async function loadAIData() {
+      try {
+        setLoadingAI(true);
+        // 并行加载消息标注和摘要
+        const [annotatedRes, summaryRes] = await Promise.all([
+          fetch(
+            `http://localhost:8000/discussions/${selectedDataset}/messages/annotated`
+          ),
+          fetch(
+            `http://localhost:8000/discussions/${selectedDataset}/ai-summary`
+          ),
+        ]);
+
+        if (annotatedRes.ok) {
+          const data = await annotatedRes.json();
+          setAiMessages(data.messages || []);
+        }
+
+        if (summaryRes.ok) {
+          const summaryData = await summaryRes.json();
+          console.log("AI Summaries:", summaryData);
+          setAiSummaries(summaryData.summaries || []);
+        }
+      } catch (error) {
+        console.error("Error loading AI data:", error);
+      } finally {
+        setLoadingAI(false);
+      }
+    }
+
+    loadAIData();
+  }, [viewMode, selectedDataset]);
 
   useEffect(() => {
     if (
@@ -476,31 +530,11 @@ export default function Home() {
                       : "border-gray-200 bg-white hover:bg-gray-50"
                       }`}
                   >
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="font-medium">{msg.author}</span>
-                      <span className="text-xs text-gray-500">{msg.timestamp}</span>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-medium text-sm">{msg.author}</span>
+                      <span className="text-xs text-gray-400">{msg.timestamp}</span>
                     </div>
-                    <div className="mb-2 text-sm text-gray-700">{msg.text}</div>
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <span className="rounded bg-gray-100 px-2 py-1">id: {msg.id}</span>
-                      <span className="rounded bg-gray-100 px-2 py-1">
-                        parent: {msg.parentId ?? "root"}
-                      </span>
-                      {msg.topic && (
-                        <span className="rounded bg-blue-100 px-2 py-1 text-blue-800">
-                          topic: {msg.topic}
-                        </span>
-                      )}
-                      {msg.sentiment && (
-                        <span
-                          className={`rounded px-2 py-1 ${sentimentBadgeClass(
-                            msg.sentiment
-                          )}`}
-                        >
-                          sentiment: {msg.sentiment}
-                        </span>
-                      )}
-                    </div>
+                    <div className="text-sm text-gray-700 leading-relaxed">{msg.text}</div>
                   </button>
                 ))}
               </div>
@@ -512,7 +546,12 @@ export default function Home() {
               {graphMode === "message" ? "Thread Map" : "Topic Graph"}
             </h2>
 
-            {graphMode === "message" ? (
+            {loadingAI && viewMode === "graph" ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+                <p className="text-gray-600">🤖 AI is analyzing the discussion...</p>
+              </div>
+            ) : graphMode === "message" ? (
               <ThreadMapView
                 messages={topicFilteredMessages}
                 selectedMessageId={selectedMessage?.id ?? null}
@@ -594,6 +633,54 @@ export default function Home() {
           )}
         </section>
       </div>
+
+      {/* AI Summary Section */}
+      {viewMode === "graph" && aiSummaries.length > 0 && (
+        <section className="rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 p-6 shadow">
+          <h2 className="mb-4 text-xl font-semibold">🤖 AI Analysis Summary</h2>
+
+          <div className="space-y-4">
+            {aiSummaries.map((summary, idx) => (
+              <div
+                key={idx}
+                className="rounded-lg border border-indigo-200 bg-white p-4"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1">
+                    <span className="text-sm font-semibold text-indigo-700">Thread #{idx + 1}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">Root: {summary.root_id}</span>
+                </div>
+
+                <div className="mb-3 border-t border-indigo-200 pt-3">
+                  <div className="text-sm text-gray-500">Topic</div>
+                  <div className="text-lg font-semibold text-indigo-700">
+                    {summary.main_topic}
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <div className="text-sm text-gray-500">Summary</div>
+                  <p className="text-sm text-gray-700">{summary.summary}</p>
+                </div>
+
+                <div>
+                  <div className="mb-2 text-sm text-gray-500">Key Points</div>
+                  <ul className="space-y-1">
+                    {Array.isArray(summary.key_points) &&
+                      summary.key_points.map((point: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                          <span className="mt-1 inline-block h-2 w-2 rounded-full bg-indigo-500 flex-shrink-0"></span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

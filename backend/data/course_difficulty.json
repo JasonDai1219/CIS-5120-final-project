@@ -1,0 +1,65 @@
+[
+  {
+    "id": "ex1",
+    "author": "Professor Johnson",
+    "timestamp": "2026-03-12T14:00:00Z",
+    "text": "How are everyone finding the difficulty level of this course?",
+    "parentId": null
+  },
+  {
+    "id": "ex2",
+    "author": "Alice",
+    "timestamp": "2026-03-12T14:15:00Z",
+    "text": "The material is challenging but manageable.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex3",
+    "author": "Bob",
+    "timestamp": "2026-03-12T14:20:00Z",
+    "text": "I find the assignments too demanding for the time we have.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex4",
+    "author": "Carol",
+    "timestamp": "2026-03-12T14:25:00Z",
+    "text": "I actually think it's too easy. We need more rigor.",
+    "parentId": "ex3"
+  },
+  {
+    "id": "ex5",
+    "author": "Dan",
+    "timestamp": "2026-03-12T14:30:00Z",
+    "text": "Maybe we could have different difficulty tracks?",
+    "parentId": "ex4"
+  },
+  {
+    "id": "ex6",
+    "author": "Eve",
+    "timestamp": "2026-03-12T14:35:00Z",
+    "text": "That's a good idea. Optional advanced topics would help.",
+    "parentId": "ex5"
+  },
+  {
+    "id": "ex7",
+    "author": "Frank",
+    "timestamp": "2026-03-12T14:40:00Z",
+    "text": "What about providing more resources for struggling students?",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex8",
+    "author": "Grace",
+    "timestamp": "2026-03-12T14:45:00Z",
+    "text": "Office hours have been really helpful for me.",
+    "parentId": "ex7"
+  },
+  {
+    "id": "ex9",
+    "author": "Henry",
+    "timestamp": "2026-03-12T14:50:00Z",
+    "text": "Can we have more office hours? Current times don't work for me.",
+    "parentId": "ex8"
+  }
+]
