@@ -45,13 +45,16 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<"chat" | "graph">("chat");
   const [graphMode, setGraphMode] = useState<"message" | "topic">("message");
   const [timeFilter, setTimeFilter] = useState<"all" | "week1" | "week2">("all");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   const messagesById = useMemo(() => {
-    // 如果有 AI 数据，使用 AI 数据；否则使用原始数据
+    // Use AI-enriched messages if available, otherwise fall back to raw messages
     const sourceMessages = aiMessages.length > 0 ? aiMessages : messages;
     return Object.fromEntries(sourceMessages.map((msg) => [msg.id, msg]));
   }, [messages, aiMessages]);
@@ -61,7 +64,7 @@ export default function Home() {
     : null;
 
   const filteredMessages = useMemo(() => {
-    // 如果有 AI 数据，优先使用 AI 数据
+    // Prefer AI-enriched messages when available
     const sourceMessages = aiMessages.length > 0 ? aiMessages : messages;
     
     if (timeFilter === "all") return sourceMessages;
@@ -269,7 +272,7 @@ export default function Home() {
       try {
         setLoading(true);
         setError("");
-        // 切换数据集时清空 AI 数据
+        // Clear AI data when switching datasets
         setAiMessages([]);
         setAiSummaries([]);
 
@@ -291,15 +294,14 @@ export default function Home() {
     loadMessages();
   }, [selectedDataset]);
 
-  // 当切换到 Graph View 时自动加载 AI 数据和摘要
+  // Automatically load AI data and summaries when switching to Graph View
   useEffect(() => {
-    // 只在 Graph View 时加载 AI 数据
     if (viewMode !== "graph" || !selectedDataset) return;
 
     async function loadAIData() {
       try {
         setLoadingAI(true);
-        // 并行加载消息标注和摘要
+        // Load annotations and summaries in parallel
         const [annotatedRes, summaryRes] = await Promise.all([
           fetch(
             `http://localhost:8000/discussions/${selectedDataset}/messages/annotated`
@@ -337,6 +339,49 @@ export default function Home() {
       setSelectedMessage(topicFilteredMessages[0] ?? null);
     }
   }, [topicFilteredMessages, selectedMessage]);
+
+  async function handleFileUpload(file: File) {
+    setUploadError("");
+    if (!file.name.endsWith(".json")) {
+      setUploadError("Only .json files are supported.");
+      return;
+    }
+
+    let parsed: unknown;
+    try {
+      const text = await file.text();
+      parsed = JSON.parse(text);
+    } catch {
+      setUploadError("Could not parse file as JSON.");
+      return;
+    }
+
+    if (!Array.isArray(parsed)) {
+      setUploadError("JSON must be an array of messages.");
+      return;
+    }
+
+    const name = file.name.replace(/\.json$/, "");
+    try {
+      const res = await fetch("/api/datasets/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, messages: parsed }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.detail ?? "Upload failed.");
+        return;
+      }
+      const newId: string = data.datasetId;
+      setDatasetIds((prev) => prev.includes(newId) ? prev : [...prev, newId]);
+      setSelectedDataset(newId);
+      setUploadSuccess(`"${newId}" uploaded successfully (${data.messageCount} messages).`);
+      setTimeout(() => setUploadSuccess(""), 4000);
+    } catch {
+      setUploadError("Upload failed. Is the backend running?");
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
@@ -425,6 +470,48 @@ export default function Home() {
             </option>
           ))}
         </select>
+      </div>
+
+      <div
+        className={`mb-6 rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
+          isDragOver
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300 bg-white hover:border-gray-400"
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          const file = e.dataTransfer.files[0];
+          if (file) handleFileUpload(file);
+        }}
+      >
+        <p className="text-sm text-gray-500">
+          Drag &amp; drop a <span className="font-semibold">.json</span> file here to upload a custom dataset
+        </p>
+        <p className="mt-1 text-xs text-gray-400">
+          Format: [&#123; &quot;id&quot;, &quot;author&quot;, &quot;timestamp&quot;, &quot;text&quot;, &quot;parentId&quot; &#125;, ...]
+        </p>
+        <label className="mt-3 inline-block cursor-pointer rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200">
+          Or click to select a file
+          <input
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        {uploadError && (
+          <p className="mt-2 text-sm text-red-600">{uploadError}</p>
+        )}
+        {uploadSuccess && (
+          <p className="mt-2 text-sm text-green-600 font-medium">{uploadSuccess}</p>
+        )}
       </div>
 
       <div className="mb-6 grid grid-cols-3 gap-4">

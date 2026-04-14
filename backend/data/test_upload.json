@@ -1,0 +1,65 @@
+[
+  {
+    "id": "cc1",
+    "author": "Professor Jason",
+    "timestamp": "2026-03-10T10:00:00Z",
+    "text": "What topics should we cover in the remaining lectures?",
+    "parentId": null
+  },
+  {
+    "id": "cc2",
+    "author": "Alice",
+    "timestamp": "2026-03-10T10:15:00Z",
+    "text": "I'd like more coverage on machine learning applications.",
+    "parentId": "cc1"
+  },
+  {
+    "id": "cc3",
+    "author": "Bob",
+    "timestamp": "2026-03-10T10:20:00Z",
+    "text": "I agree with Alice. ML is really important for our field.",
+    "parentId": "cc2"
+  },
+  {
+    "id": "cc4",
+    "author": "Carol",
+    "timestamp": "2026-03-10T10:25:00Z",
+    "text": "What about data visualization? That seems equally important.",
+    "parentId": "cc1"
+  },
+  {
+    "id": "cc5",
+    "author": "Dan",
+    "timestamp": "2026-03-10T10:30:00Z",
+    "text": "Both are good. Maybe we can do a combined module on ML visualization?",
+    "parentId": "cc4"
+  },
+  {
+    "id": "cc6",
+    "author": "Eve",
+    "timestamp": "2026-03-15T09:00:00Z",
+    "text": "Can we get more practice problems for the exam?",
+    "parentId": null
+  },
+  {
+    "id": "cc7",
+    "author": "Frank",
+    "timestamp": "2026-03-15T09:10:00Z",
+    "text": "Yes, please! More examples would really help.",
+    "parentId": "cc6"
+  },
+  {
+    "id": "cc8",
+    "author": "Grace",
+    "timestamp": "2026-03-15T09:15:00Z",
+    "text": "The existing problem set is already comprehensive.",
+    "parentId": "cc6"
+  },
+  {
+    "id": "cc9",
+    "author": "Henry",
+    "timestamp": "2026-03-15T09:20:00Z",
+    "text": "I think we need more difficult problems to challenge ourselves.",
+    "parentId": "cc8"
+  }
+]
