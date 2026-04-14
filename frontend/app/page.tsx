@@ -340,6 +340,14 @@ export default function Home() {
     }
   }, [topicFilteredMessages, selectedMessage]);
 
+  // When AI analysis completes, refresh selectedMessage with the enriched version
+  useEffect(() => {
+    if (aiMessages.length > 0 && selectedMessage) {
+      const enriched = aiMessages.find((m) => m.id === selectedMessage.id);
+      if (enriched) setSelectedMessage(enriched);
+    }
+  }, [aiMessages]);
+
   async function handleFileUpload(file: File) {
     setUploadError("");
     if (!file.name.endsWith(".json")) {
