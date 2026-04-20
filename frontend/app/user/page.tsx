@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import UserThreadMapView from "../components/UserThreadMapView";
 
 type Message = {
@@ -14,6 +14,7 @@ type Message = {
 };
 
 type TimeGranularity = "day" | "week" | "month";
+type TimeRange = { start: string; end: string } | null;
 
 function sentimentBadgeClass(sentiment?: string) {
   switch (sentiment) {
@@ -31,7 +32,7 @@ function sentimentBadgeClass(sentiment?: string) {
 function initials(name: string) {
   return name
     .split(" ")
-    .map((part) => part[0])
+    .map((part) => part[0] ?? "")
     .join("")
     .slice(0, 2)
     .toUpperCase();
@@ -63,17 +64,21 @@ function formatBucketLabel(bucket: string, granularity: TimeGranularity) {
   if (bucket === "all") return "All";
 
   if (granularity === "day") {
-    const [year, month, day] = bucket.split("-");
+    const [, month, day] = bucket.split("-");
     return `${month}/${day}`;
   }
 
   if (granularity === "week") {
-    const [year, month, day] = bucket.split("-");
+    const [, month, day] = bucket.split("-");
     return `Week ${month}/${day}`;
   }
 
   const [year, month] = bucket.split("-");
   return `${month}/${year}`;
+}
+
+function compareBuckets(a: string, b: string) {
+  return a.localeCompare(b);
 }
 
 export default function UserAppPage() {
@@ -82,12 +87,94 @@ export default function UserAppPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [aiMessages, setAiMessages] = useState<Message[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "chat">("map");
   const [timeGranularity, setTimeGranularity] =
     useState<TimeGranularity>("week");
-  const [selectedTimeBucket, setSelectedTimeBucket] = useState<string>("all");
+  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>(null);
+  const [pendingScrollMessageId, setPendingScrollMessageId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [error, setError] = useState("");
+
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const scrollToMessage = (messageId: string) => {
+    const target = messageRefs.current[messageId];
+    const container = chatScrollRef.current;
+
+    if (!target || !container) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    target.classList.add("ring-2", "ring-[#7A9B6E]", "ring-offset-2");
+    window.setTimeout(() => {
+      target.classList.remove("ring-2", "ring-[#7A9B6E]", "ring-offset-2");
+    }, 1200);
+  };
+
+  const isBucketSelected = (bucket: string) => {
+    if (!selectedTimeRange) return bucket === "all";
+
+    return (
+      compareBuckets(bucket, selectedTimeRange.start) >= 0 &&
+      compareBuckets(bucket, selectedTimeRange.end) <= 0
+    );
+  };
+
+  const toggleBucketSelection = (bucket: string) => {
+    if (bucket === "all") {
+      setSelectedTimeRange(null);
+      return;
+    }
+
+    if (!selectedTimeRange) {
+      setSelectedTimeRange({ start: bucket, end: bucket });
+      return;
+    }
+
+    const isInsideRange =
+      compareBuckets(bucket, selectedTimeRange.start) >= 0 &&
+      compareBuckets(bucket, selectedTimeRange.end) <= 0;
+
+    if (isInsideRange) {
+      setSelectedTimeRange({ start: bucket, end: bucket });
+      return;
+    }
+
+    const start =
+      compareBuckets(bucket, selectedTimeRange.start) < 0
+        ? bucket
+        : selectedTimeRange.start;
+
+    const end =
+      compareBuckets(bucket, selectedTimeRange.end) > 0
+        ? bucket
+        : selectedTimeRange.end;
+
+    setSelectedTimeRange({ start, end });
+  };
+
+  const jumpToParentMessage = (parent: Message, current: Message) => {
+    const parentBucket = getBucketKey(parent.timestamp, timeGranularity);
+    const currentBucket = getBucketKey(current.timestamp, timeGranularity);
+
+    const start =
+      compareBuckets(parentBucket, currentBucket) <= 0
+        ? parentBucket
+        : currentBucket;
+
+    const end =
+      compareBuckets(parentBucket, currentBucket) <= 0
+        ? currentBucket
+        : parentBucket;
+
+    setSelectedTimeRange({ start, end });
+    setPendingScrollMessageId(parent.id);
+  };
 
   const sourceMessages = useMemo(() => {
     return aiMessages.length > 0 ? aiMessages : messages;
@@ -105,17 +192,36 @@ export default function UserAppPage() {
     return ["all", ...Array.from(unique).sort()];
   }, [sourceMessages, timeGranularity]);
 
-  const filteredMessages = useMemo(() => {
-    if (selectedTimeBucket === "all") return sourceMessages;
+  const timeFilteredMessages = useMemo(() => {
+    if (!selectedTimeRange) return sourceMessages;
 
-    return sourceMessages.filter(
-      (msg) => getBucketKey(msg.timestamp, timeGranularity) === selectedTimeBucket
+    return sourceMessages.filter((msg) => {
+      const bucket = getBucketKey(msg.timestamp, timeGranularity);
+      return (
+        compareBuckets(bucket, selectedTimeRange.start) >= 0 &&
+        compareBuckets(bucket, selectedTimeRange.end) <= 0
+      );
+    });
+  }, [sourceMessages, selectedTimeRange, timeGranularity]);
+
+  const availableTopics = useMemo(() => {
+    const topics = new Set(
+      timeFilteredMessages
+        .map((msg) => msg.topic)
+        .filter((topic): topic is string => !!topic && topic !== "unknown")
     );
-  }, [sourceMessages, selectedTimeBucket, timeGranularity]);
+
+    return ["all", ...Array.from(topics).sort()];
+  }, [timeFilteredMessages]);
+
+  const topicFilteredMessages = useMemo(() => {
+    if (!selectedTopic || selectedTopic === "all") return timeFilteredMessages;
+    return timeFilteredMessages.filter((msg) => msg.topic === selectedTopic);
+  }, [timeFilteredMessages, selectedTopic]);
 
   const roots = useMemo(() => {
-    return filteredMessages.filter((m) => !m.parentId).length;
-  }, [filteredMessages]);
+    return topicFilteredMessages.filter((m) => !m.parentId).length;
+  }, [topicFilteredMessages]);
 
   const depth = useMemo(() => {
     const depthOf = (msg: Message): number => {
@@ -128,8 +234,10 @@ export default function UserAppPage() {
       return d;
     };
 
-    return filteredMessages.length ? Math.max(...filteredMessages.map(depthOf)) : 0;
-  }, [filteredMessages, messagesById]);
+    return topicFilteredMessages.length
+      ? Math.max(...topicFilteredMessages.map(depthOf))
+      : 0;
+  }, [topicFilteredMessages, messagesById]);
 
   const sentimentLine = useMemo(() => {
     const value = (sentiment?: string) => {
@@ -145,14 +253,24 @@ export default function UserAppPage() {
       }
     };
 
-    const total = filteredMessages.reduce((sum, m) => sum + value(m.sentiment), 0);
-    const avg = filteredMessages.length ? total / filteredMessages.length : 0;
+    const total = topicFilteredMessages.reduce(
+      (sum, m) => sum + value(m.sentiment),
+      0
+    );
+    const avg = topicFilteredMessages.length
+      ? total / topicFilteredMessages.length
+      : 0;
 
-    const supportive = filteredMessages.filter((m) => m.sentiment === "supportive").length;
-    const neutral = filteredMessages.filter(
-      (m) => !m.sentiment || m.sentiment === "neutral" || m.sentiment === "mixed"
+    const supportive = topicFilteredMessages.filter(
+      (m) => m.sentiment === "supportive"
     ).length;
-    const critical = filteredMessages.filter((m) => m.sentiment === "critical").length;
+    const neutral = topicFilteredMessages.filter(
+      (m) =>
+        !m.sentiment || m.sentiment === "neutral" || m.sentiment === "mixed"
+    ).length;
+    const critical = topicFilteredMessages.filter(
+      (m) => m.sentiment === "critical"
+    ).length;
     const totalCount = supportive + neutral + critical || 1;
 
     return {
@@ -161,7 +279,7 @@ export default function UserAppPage() {
       neutralPct: (neutral / totalCount) * 100,
       criticalPct: (critical / totalCount) * 100,
     };
-  }, [filteredMessages]);
+  }, [topicFilteredMessages]);
 
   useEffect(() => {
     async function loadDatasets() {
@@ -173,7 +291,9 @@ export default function UserAppPage() {
         setDatasetIds(ids);
         if (ids.length > 0) setSelectedDataset(ids[0]);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load datasets");
+        setError(
+          err instanceof Error ? err.message : "Failed to load datasets"
+        );
       }
     }
 
@@ -191,20 +311,25 @@ export default function UserAppPage() {
 
         const data = await res.json();
         const msgs = Array.isArray(data.messages) ? data.messages : [];
+
+        setAiMessages([]);
         setMessages(msgs);
-        setSelectedTimeBucket("all");
+        setSelectedTimeRange(null);
+        setPendingScrollMessageId(null);
+        setSelectedTopic(null);
 
         const initial = msgs[0] ?? null;
         setSelectedMessage(initial);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load messages");
+        setError(
+          err instanceof Error ? err.message : "Failed to load messages"
+        );
       }
     }
 
     loadMessages();
   }, [selectedDataset]);
 
-  // Load AI-annotated messages when map view is active so sentiment/topics appear
   useEffect(() => {
     if (viewMode !== "map" || !selectedDataset) return;
 
@@ -212,14 +337,16 @@ export default function UserAppPage() {
 
     async function loadAnnotated() {
       try {
-        const res = await fetch(`http://localhost:8000/discussions/${selectedDataset}/messages/annotated`);
-        if (!res.ok) return; // leave aiMessages empty on failure
+        const res = await fetch(
+          `http://localhost:8000/discussions/${selectedDataset}/messages/annotated`
+        );
+        if (!res.ok) return;
 
         const data = await res.json();
         const msgs = Array.isArray(data.messages) ? data.messages : [];
         if (mounted) setAiMessages(msgs);
-      } catch (e) {
-        // ignore - backend may be down or API key missing
+      } catch {
+        // ignore
       }
     }
 
@@ -230,7 +357,6 @@ export default function UserAppPage() {
     };
   }, [viewMode, selectedDataset]);
 
-  // When AI-enriched messages arrive, refresh selectedMessage to the enriched version
   useEffect(() => {
     if (aiMessages.length > 0 && selectedMessage) {
       const enriched = aiMessages.find((m) => m.id === selectedMessage.id);
@@ -239,27 +365,52 @@ export default function UserAppPage() {
   }, [aiMessages, selectedMessage]);
 
   useEffect(() => {
-    setSelectedTimeBucket("all");
+    setSelectedTimeRange(null);
+    setPendingScrollMessageId(null);
+    setSelectedTopic(null);
   }, [timeGranularity]);
 
   useEffect(() => {
-    if (
-      selectedTimeBucket !== "all" &&
-      !availableTimeBuckets.includes(selectedTimeBucket)
-    ) {
-      setSelectedTimeBucket("all");
+    if (!selectedTimeRange) return;
+
+    const startValid = availableTimeBuckets.includes(selectedTimeRange.start);
+    const endValid = availableTimeBuckets.includes(selectedTimeRange.end);
+
+    if (!startValid || !endValid) {
+      setSelectedTimeRange(null);
     }
-  }, [availableTimeBuckets, selectedTimeBucket]);
+  }, [availableTimeBuckets, selectedTimeRange]);
+
+  useEffect(() => {
+    if (
+      selectedTopic &&
+      selectedTopic !== "all" &&
+      !availableTopics.includes(selectedTopic)
+    ) {
+      setSelectedTopic(null);
+    }
+  }, [availableTopics, selectedTopic]);
 
   useEffect(() => {
     if (
       selectedMessage &&
-      !filteredMessages.some((m) => m.id === selectedMessage.id)
+      !topicFilteredMessages.some((m) => m.id === selectedMessage.id)
     ) {
-      setSelectedMessage(filteredMessages[0] ?? null);
+      setSelectedMessage(topicFilteredMessages[0] ?? null);
       setSheetOpen(false);
     }
-  }, [filteredMessages, selectedMessage]);
+  }, [topicFilteredMessages, selectedMessage]);
+
+  useEffect(() => {
+    if (!pendingScrollMessageId || viewMode !== "chat") return;
+
+    const timer = window.setTimeout(() => {
+      scrollToMessage(pendingScrollMessageId);
+      setPendingScrollMessageId(null);
+    }, 150);
+
+    return () => window.clearTimeout(timer);
+  }, [topicFilteredMessages, pendingScrollMessageId, viewMode]);
 
   const closeSheet = () => {
     setSheetOpen(false);
@@ -287,47 +438,49 @@ export default function UserAppPage() {
 
               {datasetIds.length > 1 && (
                 <div className="relative">
-                    <select
+                  <select
                     value={selectedDataset}
                     onChange={(e) => setSelectedDataset(e.target.value)}
                     className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
-                    >
+                  >
                     {datasetIds.map((id) => (
-                        <option key={id} value={id}>
+                      <option key={id} value={id}>
                         {id}
-                        </option>
+                      </option>
                     ))}
-                    </select>
+                  </select>
 
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#5C7A4E]">
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#5C7A4E]">
                     ▼
-                    </span>
+                  </span>
                 </div>
-                )}
+              )}
             </div>
           </div>
 
           <div className="shrink-0 border-b border-[#d4ddd0] px-5 pb-3 pt-3">
             <div className="mb-2 flex items-center gap-2">
-            <label className="text-[11px] font-medium text-[#5C7A4E]">
+              <label className="text-[11px] font-medium text-[#5C7A4E]">
                 Group by
-            </label>
+              </label>
 
-            <div className="relative">
+              <div className="relative">
                 <select
-                value={timeGranularity}
-                onChange={(e) => setTimeGranularity(e.target.value as TimeGranularity)}
-                className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
+                  value={timeGranularity}
+                  onChange={(e) =>
+                    setTimeGranularity(e.target.value as TimeGranularity)
+                  }
+                  className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
                 >
-                <option value="day">Daily</option>
-                <option value="week">Weekly</option>
-                <option value="month">Monthly</option>
+                  <option value="day">Daily</option>
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
                 </select>
 
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#5C7A4E]">
-                ▼
+                  ▼
                 </span>
-            </div>
+              </div>
             </div>
 
             <div className="mb-2 overflow-x-auto">
@@ -335,9 +488,9 @@ export default function UserAppPage() {
                 {availableTimeBuckets.map((bucket) => (
                   <button
                     key={bucket}
-                    onClick={() => setSelectedTimeBucket(bucket)}
+                    onClick={() => toggleBucketSelection(bucket)}
                     className={`rounded-full border px-3.5 py-1 text-xs font-medium whitespace-nowrap ${
-                      selectedTimeBucket === bucket
+                      isBucketSelected(bucket)
                         ? "border-[#3D6B35] bg-[#3D6B35] text-[#f5f8f2]"
                         : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
                     }`}
@@ -345,6 +498,31 @@ export default function UserAppPage() {
                     {formatBucketLabel(bucket, timeGranularity)}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div className="mb-2 overflow-x-auto">
+              <div className="flex min-w-max gap-1.5 pr-2">
+                {availableTopics.map((topic) => {
+                  const active =
+                    (topic === "all" &&
+                      (!selectedTopic || selectedTopic === "all")) ||
+                    selectedTopic === topic;
+
+                  return (
+                    <button
+                      key={topic}
+                      onClick={() => setSelectedTopic(topic === "all" ? null : topic)}
+                      className={`rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap ${
+                        active
+                          ? "border-[#2B3A2B] bg-[#2B3A2B] text-[#f5f8f2]"
+                          : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
+                      }`}
+                    >
+                      {topic === "all" ? "All topics" : topic}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -379,10 +557,10 @@ export default function UserAppPage() {
               <div className="h-full min-h-0 px-2 py-2">
                 <div className="h-full min-h-[320px]">
                   <UserThreadMapView
-                    messages={filteredMessages}
+                    messages={topicFilteredMessages}
                     selectedMessageId={selectedMessage?.id ?? null}
                     onSelectMessage={(id) => {
-                      const msg = filteredMessages.find((m) => m.id === id);
+                      const msg = topicFilteredMessages.find((m) => m.id === id);
                       if (msg) {
                         setSelectedMessage(msg);
                         setSheetOpen(true);
@@ -392,14 +570,22 @@ export default function UserAppPage() {
                 </div>
               </div>
             ) : (
-              <div className="h-full overflow-y-auto px-4 py-3">
+              <div
+                ref={chatScrollRef}
+                className="h-full overflow-y-auto px-4 py-3"
+              >
                 <div className="flex flex-col gap-2 pb-4">
-                  {filteredMessages.map((msg) => {
-                    const parent = msg.parentId ? messagesById[msg.parentId] : null;
+                  {topicFilteredMessages.map((msg) => {
+                    const parent = msg.parentId
+                      ? messagesById[msg.parentId]
+                      : null;
 
                     return (
                       <div
                         key={msg.id}
+                        ref={(el) => {
+                          messageRefs.current[msg.id] = el;
+                        }}
                         role="button"
                         tabIndex={0}
                         onClick={() => openMessage(msg)}
@@ -409,7 +595,7 @@ export default function UserAppPage() {
                             openMessage(msg);
                           }
                         }}
-                        className="flex cursor-pointer items-start gap-2 text-left"
+                        className="flex cursor-pointer items-start gap-2 text-left rounded-[12px] transition"
                       >
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#d6e0d2] text-[10px] font-semibold text-[#2B3A2B]">
                           {initials(msg.author)}
@@ -421,7 +607,7 @@ export default function UserAppPage() {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                openMessage(parent);
+                                jumpToParentMessage(parent, msg);
                               }}
                               className="mb-2 block w-full rounded-[10px] bg-[#dfe8d8] px-2.5 py-2 text-left"
                             >
@@ -471,7 +657,7 @@ export default function UserAppPage() {
             <div className="mb-2 flex gap-2">
               <div className="flex-1 rounded-[10px] bg-[#e4ebe0] px-2 py-1.5">
                 <div className="text-base font-semibold text-[#2B3A2B]">
-                  {filteredMessages.length}
+                  {topicFilteredMessages.length}
                 </div>
                 <div className="text-[9px] uppercase tracking-[.04em] text-[#8BA07A]">
                   messages
@@ -479,14 +665,18 @@ export default function UserAppPage() {
               </div>
 
               <div className="flex-1 rounded-[10px] bg-[#e4ebe0] px-2 py-1.5">
-                <div className="text-base font-semibold text-[#2B3A2B]">{roots}</div>
+                <div className="text-base font-semibold text-[#2B3A2B]">
+                  {roots}
+                </div>
                 <div className="text-[9px] uppercase tracking-[.04em] text-[#8BA07A]">
                   threads
                 </div>
               </div>
 
               <div className="flex-1 rounded-[10px] bg-[#e4ebe0] px-2 py-1.5">
-                <div className="text-base font-semibold text-[#2B3A2B]">{depth}</div>
+                <div className="text-base font-semibold text-[#2B3A2B]">
+                  {depth}
+                </div>
                 <div className="text-[9px] uppercase tracking-[.04em] text-[#8BA07A]">
                   depth
                 </div>

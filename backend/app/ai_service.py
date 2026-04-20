@@ -1,10 +1,3 @@
-"""
-AI service for message annotation and thread summarization.
-
-Handles LLM calls with graceful fallback when API key is missing or API fails.
-Includes lightweight in-memory caching to avoid repeated calls.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -12,33 +5,22 @@ import json
 import logging
 import os
 import re
-from typing import Any, Dict, List, Optional
+import time
+from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 
 from app.schemas import Message, ThreadNode
 
-# Load environment variables from .env file
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Lightweight in-memory cache: key -> result
 _annotation_cache: Dict[str, dict] = {}
 _summary_cache: Dict[str, dict] = {}
 
 
 def _call_llm_json(prompt: str) -> Optional[dict]:
-    """
-    Call OpenAI LLM and attempt to parse response as JSON.
-    
-    Returns None if:
-    - OPENAI_API_KEY is not set
-    - API call fails (network, rate limit, etc.)
-    - Response cannot be parsed as JSON
-    
-    Never raises exceptions to prevent endpoint 500s.
-    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         logger.debug("[AI] OPENAI_API_KEY not set, returning None")
@@ -46,10 +28,10 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
 
     try:
         import openai
-        
+
         client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # Cheap, stable model for demo
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
@@ -57,8 +39,8 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
                 },
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.2,  # Low temperature for stable structure
-            timeout=10,
+            temperature=0.2,
+            timeout=20,
         )
 
         if not response.choices or not response.choices[0].message.content:
@@ -66,27 +48,29 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
             return None
 
         raw_text = response.choices[0].message.content.strip()
-        logger.debug(f"[AI] Raw LLM response: {raw_text[:100]}...")
+        logger.debug(f"[AI] Raw LLM response: {raw_text[:200]}...")
 
-        # Try direct JSON parse
         try:
-            result = json.loads(raw_text)
-            logger.debug("[AI] JSON parsed successfully")
-            return result
+            return json.loads(raw_text)
         except json.JSONDecodeError:
-            # Try to extract JSON block from response
             match = re.search(r"\{.*\}", raw_text, re.DOTALL)
             if match:
                 try:
-                    result = json.loads(match.group())
-                    logger.debug("[AI] JSON extracted and parsed from response")
-                    return result
+                    return json.loads(match.group())
                 except json.JSONDecodeError:
-                    logger.warning("[AI] Failed to parse extracted JSON")
+                    logger.warning("[AI] Failed to parse extracted JSON object")
                     return None
-            else:
-                logger.warning("[AI] No JSON block found in response")
-                return None
+
+            match = re.search(r"\[.*\]", raw_text, re.DOTALL)
+            if match:
+                try:
+                    return {"items": json.loads(match.group())}
+                except json.JSONDecodeError:
+                    logger.warning("[AI] Failed to parse extracted JSON array")
+                    return None
+
+            logger.warning("[AI] No JSON block found in response")
+            return None
 
     except ImportError:
         logger.warning("[AI] openai package not installed, returning None")
@@ -96,56 +80,144 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
         return None
 
 
-def annotate_message(message: Message) -> dict:
-    """
-    Annotate a single message with topic and sentiment.
-    
-    Returns a dict with 'topic' and 'sentiment' keys.
-    Uses cache first, then tries LLM, then falls back to default "unknown" labels.
-    """
-    # Create cache key from message content
-    cache_key = hashlib.sha256(message.text.encode()).hexdigest()
-    if cache_key in _annotation_cache:
-        logger.debug(f"[AI] Using cached annotation for message {message.id}")
-        return _annotation_cache[cache_key]
+def _chunk_messages(messages: List[Message], chunk_size: int = 10) -> List[List[Message]]:
+    return [messages[i:i + chunk_size] for i in range(0, len(messages), chunk_size)]
 
-    # If already annotated, return as-is
-    if message.topic != "unknown" and message.sentiment != "unknown":
-        logger.debug(f"[AI] Message {message.id} already annotated, skipping")
-        return {"topic": message.topic, "sentiment": message.sentiment}
 
-    # Try LLM annotation
-    prompt = f"""Analyze this discussion message and return JSON with 'topic' and 'sentiment'.
+def _build_message_cache_key(message: Message) -> str:
+    payload = f"{message.id}|{message.text}"
+    return hashlib.sha256(payload.encode()).hexdigest()
 
-topic: One of: deadline, grading, meeting, participation, logistics, other
-sentiment: One of: supportive, critical, mixed, neutral
 
-Message: "{message.text}"
+def _annotate_message_batch(messages: List[Message]) -> Dict[str, dict]:
+    if not messages:
+        return {}
 
-Return ONLY valid JSON with exactly these two fields, no other text."""
+    uncached_messages: List[Message] = []
+    results: Dict[str, dict] = {}
 
-    result = _call_llm_json(prompt)
-    if result and "topic" in result and "sentiment" in result:
-        logger.info(
-            f"[AI] Message {message.id} annotated via API: "
-            f"topic={result['topic']}, sentiment={result['sentiment']}"
+    for msg in messages:
+        cache_key = _build_message_cache_key(msg)
+
+        if msg.topic != "unknown" and msg.sentiment != "unknown":
+            results[msg.id] = {"topic": msg.topic, "sentiment": msg.sentiment}
+            continue
+
+        if cache_key in _annotation_cache:
+            results[msg.id] = _annotation_cache[cache_key]
+            logger.debug(f"[AI] Using cached annotation for message {msg.id}")
+            continue
+
+        uncached_messages.append(msg)
+
+    if not uncached_messages:
+        return results
+
+    prompt_payload = [
+        {"id": msg.id, "text": msg.text}
+        for msg in uncached_messages
+    ]
+
+    prompt = f"""Analyze these discussion messages and return ONLY valid JSON as an array.
+
+For each message, return:
+- "id"
+- "topic"
+- "sentiment"
+
+Allowed topic values:
+deadline, grading, meeting, participation, logistics, other
+
+Allowed sentiment values:
+supportive, critical, mixed, neutral
+
+Messages:
+{json.dumps(prompt_payload, ensure_ascii=False)}
+
+Return ONLY JSON in this format:
+[
+  {{"id":"cc1","topic":"deadline","sentiment":"critical"}},
+  {{"id":"cc2","topic":"participation","sentiment":"supportive"}}
+]
+"""
+
+    parsed_items: Optional[List[dict]] = None
+
+    for attempt in range(3):
+        result = _call_llm_json(prompt)
+
+        if result is not None:
+            if isinstance(result, dict) and isinstance(result.get("items"), list):
+                parsed_items = result["items"]
+                break
+            if isinstance(result, list):
+                parsed_items = result
+                break
+
+        sleep_seconds = 5 * (attempt + 1)
+        logger.warning(
+            f"[AI] Batch annotation attempt {attempt + 1} failed for "
+            f"{len(uncached_messages)} messages, retrying in {sleep_seconds}s"
         )
-        _annotation_cache[cache_key] = result
-        return result
+        time.sleep(sleep_seconds)
 
-    # Fallback: return "unknown" for both fields when API unavailable
-    logger.warning(
-        f"[AI] API annotation failed for message {message.id}, returning 'unknown' labels"
+    if parsed_items is None:
+        logger.warning(
+            f"[AI] Batch annotation failed for {len(uncached_messages)} messages, "
+            "returning 'unknown' labels"
+        )
+        for msg in uncached_messages:
+            results[msg.id] = {"topic": "unknown", "sentiment": "unknown"}
+        return results
+
+    parsed_by_id: Dict[str, dict] = {}
+    for item in parsed_items:
+        if not isinstance(item, dict):
+            continue
+
+        msg_id = item.get("id")
+        topic = item.get("topic", "unknown")
+        sentiment = item.get("sentiment", "unknown")
+
+        if not isinstance(msg_id, str):
+            continue
+
+        if topic not in {"deadline", "grading", "meeting", "participation", "logistics", "other"}:
+            topic = "unknown"
+
+        if sentiment not in {"supportive", "critical", "mixed", "neutral"}:
+            sentiment = "unknown"
+
+        parsed_by_id[msg_id] = {"topic": topic, "sentiment": sentiment}
+
+    for msg in uncached_messages:
+        annotation = parsed_by_id.get(msg.id, {"topic": "unknown", "sentiment": "unknown"})
+        results[msg.id] = annotation
+
+        if annotation["topic"] != "unknown" or annotation["sentiment"] != "unknown":
+            cache_key = _build_message_cache_key(msg)
+            _annotation_cache[cache_key] = annotation
+            logger.info(
+                f"[AI] Message {msg.id} annotated via batch API: "
+                f"topic={annotation['topic']}, sentiment={annotation['sentiment']}"
+            )
+        else:
+            logger.warning(
+                f"[AI] No valid batch annotation returned for message {msg.id}, "
+                "using 'unknown' labels"
+            )
+
+    return results
+
+
+def annotate_message(message: Message) -> dict:
+    return _annotate_message_batch([message]).get(
+        message.id,
+        {"topic": "unknown", "sentiment": "unknown"},
     )
-    return {"topic": "unknown", "sentiment": "unknown"}
 
 
 def flatten_thread(root: ThreadNode) -> List[Message]:
-    """
-    Recursively flatten a thread tree into a list of messages sorted by timestamp.
-    
-    Traverses entire subtree, not just immediate children.
-    """
     messages: List[Message] = []
 
     def dfs(node: ThreadNode) -> None:
@@ -169,13 +241,6 @@ def flatten_thread(root: ThreadNode) -> List[Message]:
 
 
 def format_thread_transcript(messages: List[Message]) -> str:
-    """
-    Format a list of messages into a simple numbered transcript.
-    
-    Example output:
-    1. Alice: Should we extend the deadline?
-    2. Bob: I think yes.
-    """
     lines = []
     for idx, msg in enumerate(messages, start=1):
         lines.append(f"{idx}. {msg.author}: {msg.text}")
@@ -183,31 +248,15 @@ def format_thread_transcript(messages: List[Message]) -> str:
 
 
 def summarize_thread(root: ThreadNode, all_messages: List[Message]) -> dict:
-    """
-    Summarize a thread (root and all descendants) and return structure:
-    {
-        "root_id": str,
-        "main_topic": str,
-        "summary": str,
-        "key_points": List[str]
-    }
-    
-    Uses cache, LLM if available, then keyword-based fallback.
-    """
-    # Create cache key from root ID
     cache_key = f"summary_{root.id}"
     if cache_key in _summary_cache:
         logger.debug(f"[AI] Using cached summary for root {root.id}")
         return _summary_cache[cache_key]
 
-    # Flatten thread and get all messages in this subtree
     thread_messages = flatten_thread(root)
-
-    # Infer main topic from root message annotations
     root_msg = next((m for m in all_messages if m.id == root.id), None)
     main_topic = root_msg.topic if root_msg else "unknown"
 
-    # Try LLM summary
     transcript = format_thread_transcript(thread_messages)
     prompt = f"""Summarize this discussion thread. Return ONLY valid JSON with:
 - "summary": 1-2 sentence overall summary
@@ -224,26 +273,25 @@ Return ONLY JSON, no markdown or extra text."""
             "root_id": root.id,
             "main_topic": main_topic,
             "summary": result["summary"],
-            "key_points": result["key_points"] if isinstance(result["key_points"], list) else [result["key_points"]],
+            "key_points": result["key_points"]
+            if isinstance(result["key_points"], list)
+            else [result["key_points"]],
         }
         logger.info(f"[AI] Summary for root {root.id} generated via API")
         _summary_cache[cache_key] = summary_dict
         return summary_dict
 
-    # Fallback: template-based summary
     logger.info(f"[AI] Using fallback summary for root {root.id}")
     return _summarize_fallback(root, thread_messages)
 
 
 def _summarize_fallback(root: ThreadNode, thread_messages: List[Message]) -> dict:
-    """Fallback summary when API unavailable."""
-    # Simple template-based fallback
     summary = f"[No API] Discussion started with: \"{root.text[:100]}...\""
 
     key_points = [
         "API summary unavailable - annotation labels provide limited insight.",
         f"Thread has {len(thread_messages)} messages in total.",
-        f"Root message by {root.author}."
+        f"Root message by {root.author}.",
     ]
 
     main_topic = root.topic if root.topic != "unknown" else "general"
@@ -259,24 +307,28 @@ def _summarize_fallback(root: ThreadNode, thread_messages: List[Message]) -> dic
 
 
 def enrich_messages_with_ai(messages: List[Message]) -> List[dict]:
-    """
-    Enrich messages with AI annotations (topic, sentiment).
-    
-    Skips messages already fully annotated.
-    Returns list of dicts (not Pydantic models) to avoid mutation issues.
-    """
-    enriched = []
-    for msg in messages:
-        # Convert to dict
-        msg_dict = msg.model_dump()
+    enriched: List[dict] = []
 
-        # Only enrich if missing or unknown
-        if msg.topic == "unknown" or msg.sentiment == "unknown":
-            annotation = annotate_message(msg)
-            if annotation.get("topic") != "unknown":
-                msg_dict["topic"] = annotation.get("topic", msg.topic)
-            if annotation.get("sentiment") != "unknown":
-                msg_dict["sentiment"] = annotation.get("sentiment", msg.sentiment)
+    batch_annotations: Dict[str, dict] = {}
+    for batch in _chunk_messages(messages, chunk_size=10):
+        batch_annotations.update(_annotate_message_batch(batch))
+
+    for msg in messages:
+        msg_dict = msg.model_dump()
+        annotation = batch_annotations.get(
+            msg.id,
+            {"topic": msg.topic, "sentiment": msg.sentiment},
+        )
+
+        if annotation.get("topic") != "unknown":
+            msg_dict["topic"] = annotation.get("topic", msg.topic)
+        else:
+            msg_dict["topic"] = msg.topic
+
+        if annotation.get("sentiment") != "unknown":
+            msg_dict["sentiment"] = annotation.get("sentiment", msg.sentiment)
+        else:
+            msg_dict["sentiment"] = msg.sentiment
 
         enriched.append(msg_dict)
 
