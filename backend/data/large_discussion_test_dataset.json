@@ -1,0 +1,3019 @@
+[
+  {
+    "id": "ex1",
+    "author": "Professor Johnson",
+    "timestamp": "2026-03-12T14:00:00Z",
+    "text": "How is everyone finding the difficulty level of this course so far?",
+    "parentId": null
+  },
+  {
+    "id": "ex2",
+    "author": "Alice",
+    "timestamp": "2026-03-12T14:03:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex3",
+    "author": "Bob",
+    "timestamp": "2026-03-12T14:08:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex4",
+    "author": "Carol",
+    "timestamp": "2026-03-12T14:15:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex5",
+    "author": "Dan",
+    "timestamp": "2026-03-12T14:24:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex4"
+  },
+  {
+    "id": "ex6",
+    "author": "Jack",
+    "timestamp": "2026-03-12T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex7",
+    "author": "Eve",
+    "timestamp": "2026-03-12T14:29:00Z",
+    "text": "From my experience, maybe optional advanced practice would help students who want more rigor.",
+    "parentId": "ex1"
+  },
+  {
+    "id": "ex8",
+    "author": "Frank",
+    "timestamp": "2026-03-12T14:34:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex5"
+  },
+  {
+    "id": "ex9",
+    "author": "Grace",
+    "timestamp": "2026-03-12T14:41:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex8"
+  },
+  {
+    "id": "ex10",
+    "author": "Henry",
+    "timestamp": "2026-03-12T14:50:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex8"
+  },
+  {
+    "id": "ex11",
+    "author": "Noah",
+    "timestamp": "2026-03-12T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex12",
+    "author": "Alice",
+    "timestamp": "2026-03-14T15:00:00Z",
+    "text": "Can we talk about the grading for Homework 2? The rubric felt unclear.",
+    "parentId": null
+  },
+  {
+    "id": "ex13",
+    "author": "Dan",
+    "timestamp": "2026-03-14T15:03:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex12"
+  },
+  {
+    "id": "ex14",
+    "author": "Eve",
+    "timestamp": "2026-03-14T15:08:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex12"
+  },
+  {
+    "id": "ex15",
+    "author": "Frank",
+    "timestamp": "2026-03-14T15:15:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex12"
+  },
+  {
+    "id": "ex16",
+    "author": "Grace",
+    "timestamp": "2026-03-14T15:24:00Z",
+    "text": "Maybe a better compromise is this: A checklist at the top of the assignment would make grading feel more fair.",
+    "parentId": "ex15"
+  },
+  {
+    "id": "ex17",
+    "author": "Olivia",
+    "timestamp": "2026-03-14T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex18",
+    "author": "Henry",
+    "timestamp": "2026-03-14T15:29:00Z",
+    "text": "From my experience, i think the grader focused too much on presentation instead of understanding.",
+    "parentId": "ex12"
+  },
+  {
+    "id": "ex19",
+    "author": "Isabella",
+    "timestamp": "2026-03-14T15:34:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex16"
+  },
+  {
+    "id": "ex20",
+    "author": "Jack",
+    "timestamp": "2026-03-14T15:41:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex19"
+  },
+  {
+    "id": "ex21",
+    "author": "Karen",
+    "timestamp": "2026-03-14T15:50:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex19"
+  },
+  {
+    "id": "ex22",
+    "author": "Sam",
+    "timestamp": "2026-03-14T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex23",
+    "author": "Leo",
+    "timestamp": "2026-03-14T15:55:00Z",
+    "text": "Maybe a better compromise is this: A checklist at the top of the assignment would make grading feel more fair.",
+    "parentId": "ex12"
+  },
+  {
+    "id": "ex24",
+    "author": "Bob",
+    "timestamp": "2026-03-16T16:00:00Z",
+    "text": "Should participation in discussion count more toward the final grade?",
+    "parentId": null
+  },
+  {
+    "id": "ex25",
+    "author": "Grace",
+    "timestamp": "2026-03-16T16:03:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex24"
+  },
+  {
+    "id": "ex26",
+    "author": "Henry",
+    "timestamp": "2026-03-16T16:08:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex24"
+  },
+  {
+    "id": "ex27",
+    "author": "Isabella",
+    "timestamp": "2026-03-16T16:15:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex24"
+  },
+  {
+    "id": "ex28",
+    "author": "Jack",
+    "timestamp": "2026-03-16T16:24:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex27"
+  },
+  {
+    "id": "ex29",
+    "author": "Tina",
+    "timestamp": "2026-03-16T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex30",
+    "author": "Karen",
+    "timestamp": "2026-03-16T16:29:00Z",
+    "text": "From my experience, i like participation points when they reward preparation rather than volume.",
+    "parentId": "ex24"
+  },
+  {
+    "id": "ex31",
+    "author": "Leo",
+    "timestamp": "2026-03-16T16:34:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex28"
+  },
+  {
+    "id": "ex32",
+    "author": "Maya",
+    "timestamp": "2026-03-16T16:41:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex31"
+  },
+  {
+    "id": "ex33",
+    "author": "Noah",
+    "timestamp": "2026-03-16T16:50:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex31"
+  },
+  {
+    "id": "ex34",
+    "author": "Xavier",
+    "timestamp": "2026-03-16T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex35",
+    "author": "Olivia",
+    "timestamp": "2026-03-16T16:55:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex24"
+  },
+  {
+    "id": "ex36",
+    "author": "Paul",
+    "timestamp": "2026-03-16T17:00:00Z",
+    "text": "From my experience, i like participation points when they reward preparation rather than volume.",
+    "parentId": "ex35"
+  },
+  {
+    "id": "ex37",
+    "author": "Carol",
+    "timestamp": "2026-03-18T17:00:00Z",
+    "text": "Can we move the project checkpoint deadline by two days?",
+    "parentId": null
+  },
+  {
+    "id": "ex38",
+    "author": "Jack",
+    "timestamp": "2026-03-18T17:03:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex37"
+  },
+  {
+    "id": "ex39",
+    "author": "Karen",
+    "timestamp": "2026-03-18T17:08:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex37"
+  },
+  {
+    "id": "ex40",
+    "author": "Leo",
+    "timestamp": "2026-03-18T17:15:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex37"
+  },
+  {
+    "id": "ex41",
+    "author": "Maya",
+    "timestamp": "2026-03-18T17:24:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex40"
+  },
+  {
+    "id": "ex42",
+    "author": "Yara",
+    "timestamp": "2026-03-18T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex43",
+    "author": "Noah",
+    "timestamp": "2026-03-18T17:29:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex37"
+  },
+  {
+    "id": "ex44",
+    "author": "Olivia",
+    "timestamp": "2026-03-18T17:34:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex41"
+  },
+  {
+    "id": "ex45",
+    "author": "Paul",
+    "timestamp": "2026-03-18T17:41:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex44"
+  },
+  {
+    "id": "ex46",
+    "author": "Quinn",
+    "timestamp": "2026-03-18T17:50:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex44"
+  },
+  {
+    "id": "ex47",
+    "author": "Clara",
+    "timestamp": "2026-03-18T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex48",
+    "author": "Rita",
+    "timestamp": "2026-03-18T17:55:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex37"
+  },
+  {
+    "id": "ex49",
+    "author": "Sam",
+    "timestamp": "2026-03-18T18:00:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex48"
+  },
+  {
+    "id": "ex50",
+    "author": "Tina",
+    "timestamp": "2026-03-18T18:07:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex48"
+  },
+  {
+    "id": "ex51",
+    "author": "Dan",
+    "timestamp": "2026-03-20T18:00:00Z",
+    "text": "Would it be possible to record review sessions for students who cannot attend live?",
+    "parentId": null
+  },
+  {
+    "id": "ex52",
+    "author": "Maya",
+    "timestamp": "2026-03-20T18:03:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex51"
+  },
+  {
+    "id": "ex53",
+    "author": "Noah",
+    "timestamp": "2026-03-20T18:08:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex51"
+  },
+  {
+    "id": "ex54",
+    "author": "Olivia",
+    "timestamp": "2026-03-20T18:15:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex51"
+  },
+  {
+    "id": "ex55",
+    "author": "Paul",
+    "timestamp": "2026-03-20T18:24:00Z",
+    "text": "Maybe a better compromise is this: I have found office hours useful, but the current schedule is too limited.",
+    "parentId": "ex54"
+  },
+  {
+    "id": "ex56",
+    "author": "Derek",
+    "timestamp": "2026-03-20T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex57",
+    "author": "Quinn",
+    "timestamp": "2026-03-20T18:29:00Z",
+    "text": "From my experience, could we add one virtual session each week for commuting students?",
+    "parentId": "ex51"
+  },
+  {
+    "id": "ex58",
+    "author": "Rita",
+    "timestamp": "2026-03-20T18:34:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex55"
+  },
+  {
+    "id": "ex59",
+    "author": "Sam",
+    "timestamp": "2026-03-20T18:41:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex58"
+  },
+  {
+    "id": "ex60",
+    "author": "Tina",
+    "timestamp": "2026-03-20T18:50:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex58"
+  },
+  {
+    "id": "ex61",
+    "author": "Hannah",
+    "timestamp": "2026-03-20T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex62",
+    "author": "Uma",
+    "timestamp": "2026-03-20T18:55:00Z",
+    "text": "Maybe a better compromise is this: I have found office hours useful, but the current schedule is too limited.",
+    "parentId": "ex51"
+  },
+  {
+    "id": "ex63",
+    "author": "Victor",
+    "timestamp": "2026-03-20T19:00:00Z",
+    "text": "From my experience, could we add one virtual session each week for commuting students?",
+    "parentId": "ex62"
+  },
+  {
+    "id": "ex64",
+    "author": "Wendy",
+    "timestamp": "2026-03-20T19:07:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex62"
+  },
+  {
+    "id": "ex65",
+    "author": "Xavier",
+    "timestamp": "2026-03-20T19:16:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex62"
+  },
+  {
+    "id": "ex66",
+    "author": "Eve",
+    "timestamp": "2026-03-22T14:00:00Z",
+    "text": "What do people think about adding more office hours before the midterm?",
+    "parentId": null
+  },
+  {
+    "id": "ex67",
+    "author": "Paul",
+    "timestamp": "2026-03-22T14:03:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex68",
+    "author": "Quinn",
+    "timestamp": "2026-03-22T14:08:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex69",
+    "author": "Rita",
+    "timestamp": "2026-03-22T14:15:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex70",
+    "author": "Sam",
+    "timestamp": "2026-03-22T14:24:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex69"
+  },
+  {
+    "id": "ex71",
+    "author": "Ian",
+    "timestamp": "2026-03-22T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex72",
+    "author": "Tina",
+    "timestamp": "2026-03-22T14:29:00Z",
+    "text": "From my experience, i would especially value recordings if they included problem walkthroughs.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex73",
+    "author": "Uma",
+    "timestamp": "2026-03-22T14:34:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex70"
+  },
+  {
+    "id": "ex74",
+    "author": "Victor",
+    "timestamp": "2026-03-22T14:41:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex73"
+  },
+  {
+    "id": "ex75",
+    "author": "Wendy",
+    "timestamp": "2026-03-22T14:50:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex73"
+  },
+  {
+    "id": "ex76",
+    "author": "Miles",
+    "timestamp": "2026-03-22T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex77",
+    "author": "Xavier",
+    "timestamp": "2026-03-22T14:55:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex78",
+    "author": "Yara",
+    "timestamp": "2026-03-22T15:00:00Z",
+    "text": "From my experience, i would especially value recordings if they included problem walkthroughs.",
+    "parentId": "ex77"
+  },
+  {
+    "id": "ex79",
+    "author": "Zane",
+    "timestamp": "2026-03-22T15:07:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex77"
+  },
+  {
+    "id": "ex80",
+    "author": "Amy",
+    "timestamp": "2026-03-22T15:16:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex77"
+  },
+  {
+    "id": "ex81",
+    "author": "Ben",
+    "timestamp": "2026-03-22T15:19:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex66"
+  },
+  {
+    "id": "ex82",
+    "author": "Frank",
+    "timestamp": "2026-03-24T15:00:00Z",
+    "text": "How useful have the discussion boards been for understanding the material?",
+    "parentId": null
+  },
+  {
+    "id": "ex83",
+    "author": "Sam",
+    "timestamp": "2026-03-24T15:03:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex84",
+    "author": "Tina",
+    "timestamp": "2026-03-24T15:08:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex85",
+    "author": "Uma",
+    "timestamp": "2026-03-24T15:15:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex86",
+    "author": "Victor",
+    "timestamp": "2026-03-24T15:24:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex85"
+  },
+  {
+    "id": "ex87",
+    "author": "Nina",
+    "timestamp": "2026-03-24T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex88",
+    "author": "Wendy",
+    "timestamp": "2026-03-24T15:29:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex89",
+    "author": "Xavier",
+    "timestamp": "2026-03-24T15:34:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex86"
+  },
+  {
+    "id": "ex90",
+    "author": "Yara",
+    "timestamp": "2026-03-24T15:41:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex89"
+  },
+  {
+    "id": "ex91",
+    "author": "Zane",
+    "timestamp": "2026-03-24T15:50:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex89"
+  },
+  {
+    "id": "ex92",
+    "author": "Renee",
+    "timestamp": "2026-03-24T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex93",
+    "author": "Amy",
+    "timestamp": "2026-03-24T15:55:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex94",
+    "author": "Ben",
+    "timestamp": "2026-03-24T16:00:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex93"
+  },
+  {
+    "id": "ex95",
+    "author": "Clara",
+    "timestamp": "2026-03-24T16:07:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex93"
+  },
+  {
+    "id": "ex96",
+    "author": "Derek",
+    "timestamp": "2026-03-24T16:16:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex93"
+  },
+  {
+    "id": "ex97",
+    "author": "Elena",
+    "timestamp": "2026-03-24T16:19:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex82"
+  },
+  {
+    "id": "ex98",
+    "author": "Farah",
+    "timestamp": "2026-03-24T16:24:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex96"
+  },
+  {
+    "id": "ex99",
+    "author": "Grace",
+    "timestamp": "2026-03-26T16:00:00Z",
+    "text": "Should we have more worked examples in lecture?",
+    "parentId": null
+  },
+  {
+    "id": "ex100",
+    "author": "Victor",
+    "timestamp": "2026-03-26T16:03:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex99"
+  },
+  {
+    "id": "ex101",
+    "author": "Wendy",
+    "timestamp": "2026-03-26T16:08:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex99"
+  },
+  {
+    "id": "ex102",
+    "author": "Xavier",
+    "timestamp": "2026-03-26T16:15:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex99"
+  },
+  {
+    "id": "ex103",
+    "author": "Yara",
+    "timestamp": "2026-03-26T16:24:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex102"
+  },
+  {
+    "id": "ex104",
+    "author": "Sofia",
+    "timestamp": "2026-03-26T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex105",
+    "author": "Zane",
+    "timestamp": "2026-03-26T16:29:00Z",
+    "text": "From my experience, examples are especially important in the weeks with new notation.",
+    "parentId": "ex99"
+  },
+  {
+    "id": "ex106",
+    "author": "Amy",
+    "timestamp": "2026-03-26T16:34:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex103"
+  },
+  {
+    "id": "ex107",
+    "author": "Ben",
+    "timestamp": "2026-03-26T16:41:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex106"
+  },
+  {
+    "id": "ex108",
+    "author": "Clara",
+    "timestamp": "2026-03-26T16:50:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex106"
+  },
+  {
+    "id": "ex109",
+    "author": "Will",
+    "timestamp": "2026-03-26T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex110",
+    "author": "Henry",
+    "timestamp": "2026-03-28T17:00:00Z",
+    "text": "Is the pacing of the class too fast right now?",
+    "parentId": null
+  },
+  {
+    "id": "ex111",
+    "author": "Yara",
+    "timestamp": "2026-03-28T17:03:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex110"
+  },
+  {
+    "id": "ex112",
+    "author": "Zane",
+    "timestamp": "2026-03-28T17:08:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex110"
+  },
+  {
+    "id": "ex113",
+    "author": "Amy",
+    "timestamp": "2026-03-28T17:15:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex110"
+  },
+  {
+    "id": "ex114",
+    "author": "Ben",
+    "timestamp": "2026-03-28T17:24:00Z",
+    "text": "Maybe a better compromise is this: I think the pacing is fine, but the homework amplifies the pressure.",
+    "parentId": "ex113"
+  },
+  {
+    "id": "ex115",
+    "author": "Xena",
+    "timestamp": "2026-03-28T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex116",
+    "author": "Clara",
+    "timestamp": "2026-03-28T17:29:00Z",
+    "text": "From my experience, a small slowdown around the midterm would help a lot.",
+    "parentId": "ex110"
+  },
+  {
+    "id": "ex117",
+    "author": "Derek",
+    "timestamp": "2026-03-28T17:34:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex114"
+  },
+  {
+    "id": "ex118",
+    "author": "Elena",
+    "timestamp": "2026-03-28T17:41:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex117"
+  },
+  {
+    "id": "ex119",
+    "author": "Farah",
+    "timestamp": "2026-03-28T17:50:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex117"
+  },
+  {
+    "id": "ex120",
+    "author": "Alice",
+    "timestamp": "2026-03-28T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex121",
+    "author": "Gavin",
+    "timestamp": "2026-03-28T17:55:00Z",
+    "text": "Maybe a better compromise is this: I think the pacing is fine, but the homework amplifies the pressure.",
+    "parentId": "ex110"
+  },
+  {
+    "id": "ex122",
+    "author": "Isabella",
+    "timestamp": "2026-03-30T18:00:00Z",
+    "text": "What would make group projects feel more fair this semester?",
+    "parentId": null
+  },
+  {
+    "id": "ex123",
+    "author": "Ben",
+    "timestamp": "2026-03-30T18:03:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex122"
+  },
+  {
+    "id": "ex124",
+    "author": "Clara",
+    "timestamp": "2026-03-30T18:08:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex122"
+  },
+  {
+    "id": "ex125",
+    "author": "Derek",
+    "timestamp": "2026-03-30T18:15:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex122"
+  },
+  {
+    "id": "ex126",
+    "author": "Elena",
+    "timestamp": "2026-03-30T18:24:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex125"
+  },
+  {
+    "id": "ex127",
+    "author": "Bob",
+    "timestamp": "2026-03-30T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex128",
+    "author": "Farah",
+    "timestamp": "2026-03-30T18:29:00Z",
+    "text": "From my experience, i think projects work best when there are visible roles and deadlines.",
+    "parentId": "ex122"
+  },
+  {
+    "id": "ex129",
+    "author": "Gavin",
+    "timestamp": "2026-03-30T18:34:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex126"
+  },
+  {
+    "id": "ex130",
+    "author": "Hannah",
+    "timestamp": "2026-03-30T18:41:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex129"
+  },
+  {
+    "id": "ex131",
+    "author": "Ian",
+    "timestamp": "2026-03-30T18:50:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex129"
+  },
+  {
+    "id": "ex132",
+    "author": "Frank",
+    "timestamp": "2026-03-30T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex133",
+    "author": "Jasmine",
+    "timestamp": "2026-03-30T18:55:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex122"
+  },
+  {
+    "id": "ex134",
+    "author": "Kevin",
+    "timestamp": "2026-03-30T19:00:00Z",
+    "text": "From my experience, i think projects work best when there are visible roles and deadlines.",
+    "parentId": "ex133"
+  },
+  {
+    "id": "ex135",
+    "author": "Jack",
+    "timestamp": "2026-04-01T14:00:00Z",
+    "text": "How is everyone finding the difficulty level of this course so far?",
+    "parentId": null
+  },
+  {
+    "id": "ex136",
+    "author": "Elena",
+    "timestamp": "2026-04-01T14:03:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex135"
+  },
+  {
+    "id": "ex137",
+    "author": "Farah",
+    "timestamp": "2026-04-01T14:08:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex135"
+  },
+  {
+    "id": "ex138",
+    "author": "Gavin",
+    "timestamp": "2026-04-01T14:15:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex135"
+  },
+  {
+    "id": "ex139",
+    "author": "Hannah",
+    "timestamp": "2026-04-01T14:24:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex138"
+  },
+  {
+    "id": "ex140",
+    "author": "Grace",
+    "timestamp": "2026-04-01T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex141",
+    "author": "Ian",
+    "timestamp": "2026-04-01T14:29:00Z",
+    "text": "From my experience, maybe optional advanced practice would help students who want more rigor.",
+    "parentId": "ex135"
+  },
+  {
+    "id": "ex142",
+    "author": "Jasmine",
+    "timestamp": "2026-04-01T14:34:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex139"
+  },
+  {
+    "id": "ex143",
+    "author": "Kevin",
+    "timestamp": "2026-04-01T14:41:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex142"
+  },
+  {
+    "id": "ex144",
+    "author": "Lily",
+    "timestamp": "2026-04-01T14:50:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex142"
+  },
+  {
+    "id": "ex145",
+    "author": "Karen",
+    "timestamp": "2026-04-01T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex146",
+    "author": "Miles",
+    "timestamp": "2026-04-01T14:55:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex135"
+  },
+  {
+    "id": "ex147",
+    "author": "Nina",
+    "timestamp": "2026-04-01T15:00:00Z",
+    "text": "From my experience, maybe optional advanced practice would help students who want more rigor.",
+    "parentId": "ex146"
+  },
+  {
+    "id": "ex148",
+    "author": "Owen",
+    "timestamp": "2026-04-01T15:07:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex146"
+  },
+  {
+    "id": "ex149",
+    "author": "Karen",
+    "timestamp": "2026-04-03T15:00:00Z",
+    "text": "Can we talk about the grading for Homework 2? The rubric felt unclear.",
+    "parentId": null
+  },
+  {
+    "id": "ex150",
+    "author": "Hannah",
+    "timestamp": "2026-04-03T15:03:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex149"
+  },
+  {
+    "id": "ex151",
+    "author": "Ian",
+    "timestamp": "2026-04-03T15:08:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex149"
+  },
+  {
+    "id": "ex152",
+    "author": "Jasmine",
+    "timestamp": "2026-04-03T15:15:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex149"
+  },
+  {
+    "id": "ex153",
+    "author": "Kevin",
+    "timestamp": "2026-04-03T15:24:00Z",
+    "text": "Maybe a better compromise is this: A checklist at the top of the assignment would make grading feel more fair.",
+    "parentId": "ex152"
+  },
+  {
+    "id": "ex154",
+    "author": "Leo",
+    "timestamp": "2026-04-03T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex155",
+    "author": "Lily",
+    "timestamp": "2026-04-03T15:29:00Z",
+    "text": "From my experience, i think the grader focused too much on presentation instead of understanding.",
+    "parentId": "ex149"
+  },
+  {
+    "id": "ex156",
+    "author": "Miles",
+    "timestamp": "2026-04-03T15:34:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex153"
+  },
+  {
+    "id": "ex157",
+    "author": "Nina",
+    "timestamp": "2026-04-03T15:41:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex156"
+  },
+  {
+    "id": "ex158",
+    "author": "Owen",
+    "timestamp": "2026-04-03T15:50:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex156"
+  },
+  {
+    "id": "ex159",
+    "author": "Paul",
+    "timestamp": "2026-04-03T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex160",
+    "author": "Priya",
+    "timestamp": "2026-04-03T15:55:00Z",
+    "text": "Maybe a better compromise is this: A checklist at the top of the assignment would make grading feel more fair.",
+    "parentId": "ex149"
+  },
+  {
+    "id": "ex161",
+    "author": "Quentin",
+    "timestamp": "2026-04-03T16:00:00Z",
+    "text": "From my experience, i think the grader focused too much on presentation instead of understanding.",
+    "parentId": "ex160"
+  },
+  {
+    "id": "ex162",
+    "author": "Renee",
+    "timestamp": "2026-04-03T16:07:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex160"
+  },
+  {
+    "id": "ex163",
+    "author": "Sofia",
+    "timestamp": "2026-04-03T16:16:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex160"
+  },
+  {
+    "id": "ex164",
+    "author": "Leo",
+    "timestamp": "2026-04-05T16:00:00Z",
+    "text": "Should participation in discussion count more toward the final grade?",
+    "parentId": null
+  },
+  {
+    "id": "ex165",
+    "author": "Kevin",
+    "timestamp": "2026-04-05T16:03:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex166",
+    "author": "Lily",
+    "timestamp": "2026-04-05T16:08:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex167",
+    "author": "Miles",
+    "timestamp": "2026-04-05T16:15:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex168",
+    "author": "Nina",
+    "timestamp": "2026-04-05T16:24:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex167"
+  },
+  {
+    "id": "ex169",
+    "author": "Quinn",
+    "timestamp": "2026-04-05T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex170",
+    "author": "Owen",
+    "timestamp": "2026-04-05T16:29:00Z",
+    "text": "From my experience, i like participation points when they reward preparation rather than volume.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex171",
+    "author": "Priya",
+    "timestamp": "2026-04-05T16:34:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex168"
+  },
+  {
+    "id": "ex172",
+    "author": "Quentin",
+    "timestamp": "2026-04-05T16:41:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex171"
+  },
+  {
+    "id": "ex173",
+    "author": "Renee",
+    "timestamp": "2026-04-05T16:50:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex171"
+  },
+  {
+    "id": "ex174",
+    "author": "Uma",
+    "timestamp": "2026-04-05T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex175",
+    "author": "Sofia",
+    "timestamp": "2026-04-05T16:55:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex176",
+    "author": "Tom",
+    "timestamp": "2026-04-05T17:00:00Z",
+    "text": "From my experience, i like participation points when they reward preparation rather than volume.",
+    "parentId": "ex175"
+  },
+  {
+    "id": "ex177",
+    "author": "Ursula",
+    "timestamp": "2026-04-05T17:07:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex175"
+  },
+  {
+    "id": "ex178",
+    "author": "Vera",
+    "timestamp": "2026-04-05T17:16:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex175"
+  },
+  {
+    "id": "ex179",
+    "author": "Will",
+    "timestamp": "2026-04-05T17:19:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex164"
+  },
+  {
+    "id": "ex180",
+    "author": "Maya",
+    "timestamp": "2026-04-07T17:00:00Z",
+    "text": "Can we move the project checkpoint deadline by two days?",
+    "parentId": null
+  },
+  {
+    "id": "ex181",
+    "author": "Nina",
+    "timestamp": "2026-04-07T17:03:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex182",
+    "author": "Owen",
+    "timestamp": "2026-04-07T17:08:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex183",
+    "author": "Priya",
+    "timestamp": "2026-04-07T17:15:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex184",
+    "author": "Quentin",
+    "timestamp": "2026-04-07T17:24:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex183"
+  },
+  {
+    "id": "ex185",
+    "author": "Victor",
+    "timestamp": "2026-04-07T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex186",
+    "author": "Renee",
+    "timestamp": "2026-04-07T17:29:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex187",
+    "author": "Sofia",
+    "timestamp": "2026-04-07T17:34:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex184"
+  },
+  {
+    "id": "ex188",
+    "author": "Tom",
+    "timestamp": "2026-04-07T17:41:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex187"
+  },
+  {
+    "id": "ex189",
+    "author": "Ursula",
+    "timestamp": "2026-04-07T17:50:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex187"
+  },
+  {
+    "id": "ex190",
+    "author": "Zane",
+    "timestamp": "2026-04-07T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex191",
+    "author": "Vera",
+    "timestamp": "2026-04-07T17:55:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex192",
+    "author": "Will",
+    "timestamp": "2026-04-07T18:00:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex191"
+  },
+  {
+    "id": "ex193",
+    "author": "Xena",
+    "timestamp": "2026-04-07T18:07:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex191"
+  },
+  {
+    "id": "ex194",
+    "author": "Yusuf",
+    "timestamp": "2026-04-07T18:16:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex191"
+  },
+  {
+    "id": "ex195",
+    "author": "Zoey",
+    "timestamp": "2026-04-07T18:19:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex180"
+  },
+  {
+    "id": "ex196",
+    "author": "Professor Johnson",
+    "timestamp": "2026-04-07T18:24:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex194"
+  },
+  {
+    "id": "ex197",
+    "author": "Noah",
+    "timestamp": "2026-04-09T18:00:00Z",
+    "text": "Would it be possible to record review sessions for students who cannot attend live?",
+    "parentId": null
+  },
+  {
+    "id": "ex198",
+    "author": "Quentin",
+    "timestamp": "2026-04-09T18:03:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex197"
+  },
+  {
+    "id": "ex199",
+    "author": "Renee",
+    "timestamp": "2026-04-09T18:08:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex197"
+  },
+  {
+    "id": "ex200",
+    "author": "Sofia",
+    "timestamp": "2026-04-09T18:15:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex197"
+  },
+  {
+    "id": "ex201",
+    "author": "Tom",
+    "timestamp": "2026-04-09T18:24:00Z",
+    "text": "Maybe a better compromise is this: I have found office hours useful, but the current schedule is too limited.",
+    "parentId": "ex200"
+  },
+  {
+    "id": "ex202",
+    "author": "Amy",
+    "timestamp": "2026-04-09T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex203",
+    "author": "Ursula",
+    "timestamp": "2026-04-09T18:29:00Z",
+    "text": "From my experience, could we add one virtual session each week for commuting students?",
+    "parentId": "ex197"
+  },
+  {
+    "id": "ex204",
+    "author": "Vera",
+    "timestamp": "2026-04-09T18:34:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex201"
+  },
+  {
+    "id": "ex205",
+    "author": "Will",
+    "timestamp": "2026-04-09T18:41:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex204"
+  },
+  {
+    "id": "ex206",
+    "author": "Xena",
+    "timestamp": "2026-04-09T18:50:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex204"
+  },
+  {
+    "id": "ex207",
+    "author": "Elena",
+    "timestamp": "2026-04-09T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex208",
+    "author": "Olivia",
+    "timestamp": "2026-04-11T14:00:00Z",
+    "text": "What do people think about adding more office hours before the midterm?",
+    "parentId": null
+  },
+  {
+    "id": "ex209",
+    "author": "Tom",
+    "timestamp": "2026-04-11T14:03:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex208"
+  },
+  {
+    "id": "ex210",
+    "author": "Ursula",
+    "timestamp": "2026-04-11T14:08:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex208"
+  },
+  {
+    "id": "ex211",
+    "author": "Vera",
+    "timestamp": "2026-04-11T14:15:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex208"
+  },
+  {
+    "id": "ex212",
+    "author": "Will",
+    "timestamp": "2026-04-11T14:24:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex211"
+  },
+  {
+    "id": "ex213",
+    "author": "Farah",
+    "timestamp": "2026-04-11T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex214",
+    "author": "Xena",
+    "timestamp": "2026-04-11T14:29:00Z",
+    "text": "From my experience, i would especially value recordings if they included problem walkthroughs.",
+    "parentId": "ex208"
+  },
+  {
+    "id": "ex215",
+    "author": "Yusuf",
+    "timestamp": "2026-04-11T14:34:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex212"
+  },
+  {
+    "id": "ex216",
+    "author": "Zoey",
+    "timestamp": "2026-04-11T14:41:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex215"
+  },
+  {
+    "id": "ex217",
+    "author": "Professor Johnson",
+    "timestamp": "2026-04-11T14:50:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex215"
+  },
+  {
+    "id": "ex218",
+    "author": "Jasmine",
+    "timestamp": "2026-04-11T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex219",
+    "author": "Alice",
+    "timestamp": "2026-04-11T14:55:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex208"
+  },
+  {
+    "id": "ex220",
+    "author": "Paul",
+    "timestamp": "2026-04-13T15:00:00Z",
+    "text": "How useful have the discussion boards been for understanding the material?",
+    "parentId": null
+  },
+  {
+    "id": "ex221",
+    "author": "Will",
+    "timestamp": "2026-04-13T15:03:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex220"
+  },
+  {
+    "id": "ex222",
+    "author": "Xena",
+    "timestamp": "2026-04-13T15:08:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex220"
+  },
+  {
+    "id": "ex223",
+    "author": "Yusuf",
+    "timestamp": "2026-04-13T15:15:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex220"
+  },
+  {
+    "id": "ex224",
+    "author": "Zoey",
+    "timestamp": "2026-04-13T15:24:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex223"
+  },
+  {
+    "id": "ex225",
+    "author": "Kevin",
+    "timestamp": "2026-04-13T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex226",
+    "author": "Professor Johnson",
+    "timestamp": "2026-04-13T15:29:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex220"
+  },
+  {
+    "id": "ex227",
+    "author": "Alice",
+    "timestamp": "2026-04-13T15:34:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex224"
+  },
+  {
+    "id": "ex228",
+    "author": "Bob",
+    "timestamp": "2026-04-13T15:41:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex227"
+  },
+  {
+    "id": "ex229",
+    "author": "Carol",
+    "timestamp": "2026-04-13T15:50:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex227"
+  },
+  {
+    "id": "ex230",
+    "author": "Owen",
+    "timestamp": "2026-04-13T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex231",
+    "author": "Dan",
+    "timestamp": "2026-04-13T15:55:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex220"
+  },
+  {
+    "id": "ex232",
+    "author": "Eve",
+    "timestamp": "2026-04-13T16:00:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex231"
+  },
+  {
+    "id": "ex233",
+    "author": "Quinn",
+    "timestamp": "2026-04-15T16:00:00Z",
+    "text": "Should we have more worked examples in lecture?",
+    "parentId": null
+  },
+  {
+    "id": "ex234",
+    "author": "Zoey",
+    "timestamp": "2026-04-15T16:03:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex233"
+  },
+  {
+    "id": "ex235",
+    "author": "Professor Johnson",
+    "timestamp": "2026-04-15T16:08:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex233"
+  },
+  {
+    "id": "ex236",
+    "author": "Alice",
+    "timestamp": "2026-04-15T16:15:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex233"
+  },
+  {
+    "id": "ex237",
+    "author": "Bob",
+    "timestamp": "2026-04-15T16:24:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex236"
+  },
+  {
+    "id": "ex238",
+    "author": "Priya",
+    "timestamp": "2026-04-15T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex239",
+    "author": "Carol",
+    "timestamp": "2026-04-15T16:29:00Z",
+    "text": "From my experience, examples are especially important in the weeks with new notation.",
+    "parentId": "ex233"
+  },
+  {
+    "id": "ex240",
+    "author": "Dan",
+    "timestamp": "2026-04-15T16:34:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex237"
+  },
+  {
+    "id": "ex241",
+    "author": "Eve",
+    "timestamp": "2026-04-15T16:41:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex240"
+  },
+  {
+    "id": "ex242",
+    "author": "Frank",
+    "timestamp": "2026-04-15T16:50:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex240"
+  },
+  {
+    "id": "ex243",
+    "author": "Tom",
+    "timestamp": "2026-04-15T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex244",
+    "author": "Grace",
+    "timestamp": "2026-04-15T16:55:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex233"
+  },
+  {
+    "id": "ex245",
+    "author": "Henry",
+    "timestamp": "2026-04-15T17:00:00Z",
+    "text": "From my experience, examples are especially important in the weeks with new notation.",
+    "parentId": "ex244"
+  },
+  {
+    "id": "ex246",
+    "author": "Isabella",
+    "timestamp": "2026-04-15T17:07:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex244"
+  },
+  {
+    "id": "ex247",
+    "author": "Rita",
+    "timestamp": "2026-04-17T17:00:00Z",
+    "text": "Is the pacing of the class too fast right now?",
+    "parentId": null
+  },
+  {
+    "id": "ex248",
+    "author": "Bob",
+    "timestamp": "2026-04-17T17:03:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex247"
+  },
+  {
+    "id": "ex249",
+    "author": "Carol",
+    "timestamp": "2026-04-17T17:08:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex247"
+  },
+  {
+    "id": "ex250",
+    "author": "Dan",
+    "timestamp": "2026-04-17T17:15:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex247"
+  },
+  {
+    "id": "ex251",
+    "author": "Eve",
+    "timestamp": "2026-04-17T17:24:00Z",
+    "text": "Maybe a better compromise is this: I think the pacing is fine, but the homework amplifies the pressure.",
+    "parentId": "ex250"
+  },
+  {
+    "id": "ex252",
+    "author": "Ursula",
+    "timestamp": "2026-04-17T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex253",
+    "author": "Frank",
+    "timestamp": "2026-04-17T17:29:00Z",
+    "text": "From my experience, a small slowdown around the midterm would help a lot.",
+    "parentId": "ex247"
+  },
+  {
+    "id": "ex254",
+    "author": "Grace",
+    "timestamp": "2026-04-17T17:34:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex251"
+  },
+  {
+    "id": "ex255",
+    "author": "Henry",
+    "timestamp": "2026-04-17T17:41:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex254"
+  },
+  {
+    "id": "ex256",
+    "author": "Isabella",
+    "timestamp": "2026-04-17T17:50:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex254"
+  },
+  {
+    "id": "ex257",
+    "author": "Yusuf",
+    "timestamp": "2026-04-17T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex258",
+    "author": "Jack",
+    "timestamp": "2026-04-17T17:55:00Z",
+    "text": "Maybe a better compromise is this: I think the pacing is fine, but the homework amplifies the pressure.",
+    "parentId": "ex247"
+  },
+  {
+    "id": "ex259",
+    "author": "Karen",
+    "timestamp": "2026-04-17T18:00:00Z",
+    "text": "From my experience, a small slowdown around the midterm would help a lot.",
+    "parentId": "ex258"
+  },
+  {
+    "id": "ex260",
+    "author": "Leo",
+    "timestamp": "2026-04-17T18:07:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex258"
+  },
+  {
+    "id": "ex261",
+    "author": "Maya",
+    "timestamp": "2026-04-17T18:16:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex258"
+  },
+  {
+    "id": "ex262",
+    "author": "Sam",
+    "timestamp": "2026-04-19T18:00:00Z",
+    "text": "What would make group projects feel more fair this semester?",
+    "parentId": null
+  },
+  {
+    "id": "ex263",
+    "author": "Eve",
+    "timestamp": "2026-04-19T18:03:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex264",
+    "author": "Frank",
+    "timestamp": "2026-04-19T18:08:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex265",
+    "author": "Grace",
+    "timestamp": "2026-04-19T18:15:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex266",
+    "author": "Henry",
+    "timestamp": "2026-04-19T18:24:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex265"
+  },
+  {
+    "id": "ex267",
+    "author": "Zoey",
+    "timestamp": "2026-04-19T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex268",
+    "author": "Isabella",
+    "timestamp": "2026-04-19T18:29:00Z",
+    "text": "From my experience, i think projects work best when there are visible roles and deadlines.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex269",
+    "author": "Jack",
+    "timestamp": "2026-04-19T18:34:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex266"
+  },
+  {
+    "id": "ex270",
+    "author": "Karen",
+    "timestamp": "2026-04-19T18:41:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex269"
+  },
+  {
+    "id": "ex271",
+    "author": "Leo",
+    "timestamp": "2026-04-19T18:50:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex269"
+  },
+  {
+    "id": "ex272",
+    "author": "Carol",
+    "timestamp": "2026-04-19T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex273",
+    "author": "Maya",
+    "timestamp": "2026-04-19T18:55:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex274",
+    "author": "Noah",
+    "timestamp": "2026-04-19T19:00:00Z",
+    "text": "From my experience, i think projects work best when there are visible roles and deadlines.",
+    "parentId": "ex273"
+  },
+  {
+    "id": "ex275",
+    "author": "Olivia",
+    "timestamp": "2026-04-19T19:07:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex273"
+  },
+  {
+    "id": "ex276",
+    "author": "Paul",
+    "timestamp": "2026-04-19T19:16:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex273"
+  },
+  {
+    "id": "ex277",
+    "author": "Quinn",
+    "timestamp": "2026-04-19T19:19:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex262"
+  },
+  {
+    "id": "ex278",
+    "author": "Tina",
+    "timestamp": "2026-04-21T14:00:00Z",
+    "text": "How is everyone finding the difficulty level of this course so far?",
+    "parentId": null
+  },
+  {
+    "id": "ex279",
+    "author": "Henry",
+    "timestamp": "2026-04-21T14:03:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex280",
+    "author": "Isabella",
+    "timestamp": "2026-04-21T14:08:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex281",
+    "author": "Jack",
+    "timestamp": "2026-04-21T14:15:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex282",
+    "author": "Karen",
+    "timestamp": "2026-04-21T14:24:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex281"
+  },
+  {
+    "id": "ex283",
+    "author": "Dan",
+    "timestamp": "2026-04-21T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex284",
+    "author": "Leo",
+    "timestamp": "2026-04-21T14:29:00Z",
+    "text": "From my experience, maybe optional advanced practice would help students who want more rigor.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex285",
+    "author": "Maya",
+    "timestamp": "2026-04-21T14:34:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex282"
+  },
+  {
+    "id": "ex286",
+    "author": "Noah",
+    "timestamp": "2026-04-21T14:41:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex285"
+  },
+  {
+    "id": "ex287",
+    "author": "Olivia",
+    "timestamp": "2026-04-21T14:50:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex285"
+  },
+  {
+    "id": "ex288",
+    "author": "Henry",
+    "timestamp": "2026-04-21T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex289",
+    "author": "Paul",
+    "timestamp": "2026-04-21T14:55:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex290",
+    "author": "Quinn",
+    "timestamp": "2026-04-21T15:00:00Z",
+    "text": "From my experience, maybe optional advanced practice would help students who want more rigor.",
+    "parentId": "ex289"
+  },
+  {
+    "id": "ex291",
+    "author": "Rita",
+    "timestamp": "2026-04-21T15:07:00Z",
+    "text": "The material is challenging but manageable if I stay on top of it.",
+    "parentId": "ex289"
+  },
+  {
+    "id": "ex292",
+    "author": "Sam",
+    "timestamp": "2026-04-21T15:16:00Z",
+    "text": "I agree. I think the pace is okay, but the assignments take longer than expected.",
+    "parentId": "ex289"
+  },
+  {
+    "id": "ex293",
+    "author": "Tina",
+    "timestamp": "2026-04-21T15:19:00Z",
+    "text": "I disagree a bit. I actually wish some topics went deeper instead of moving on so quickly.",
+    "parentId": "ex278"
+  },
+  {
+    "id": "ex294",
+    "author": "Uma",
+    "timestamp": "2026-04-21T15:24:00Z",
+    "text": "Maybe a better compromise is this: The readings help, but I still feel behind by the end of each week.",
+    "parentId": "ex292"
+  },
+  {
+    "id": "ex295",
+    "author": "Uma",
+    "timestamp": "2026-04-23T15:00:00Z",
+    "text": "Can we talk about the grading for Homework 2? The rubric felt unclear.",
+    "parentId": null
+  },
+  {
+    "id": "ex296",
+    "author": "Karen",
+    "timestamp": "2026-04-23T15:03:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex295"
+  },
+  {
+    "id": "ex297",
+    "author": "Leo",
+    "timestamp": "2026-04-23T15:08:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex295"
+  },
+  {
+    "id": "ex298",
+    "author": "Maya",
+    "timestamp": "2026-04-23T15:15:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex295"
+  },
+  {
+    "id": "ex299",
+    "author": "Noah",
+    "timestamp": "2026-04-23T15:24:00Z",
+    "text": "Maybe a better compromise is this: A checklist at the top of the assignment would make grading feel more fair.",
+    "parentId": "ex298"
+  },
+  {
+    "id": "ex300",
+    "author": "Isabella",
+    "timestamp": "2026-04-23T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex301",
+    "author": "Olivia",
+    "timestamp": "2026-04-23T15:29:00Z",
+    "text": "From my experience, i think the grader focused too much on presentation instead of understanding.",
+    "parentId": "ex295"
+  },
+  {
+    "id": "ex302",
+    "author": "Paul",
+    "timestamp": "2026-04-23T15:34:00Z",
+    "text": "I lost points for formatting even though my reasoning was correct.",
+    "parentId": "ex299"
+  },
+  {
+    "id": "ex303",
+    "author": "Quinn",
+    "timestamp": "2026-04-23T15:41:00Z",
+    "text": "I agree. The rubric felt too vague for something worth that many points.",
+    "parentId": "ex302"
+  },
+  {
+    "id": "ex304",
+    "author": "Rita",
+    "timestamp": "2026-04-23T15:50:00Z",
+    "text": "I disagree a bit. Fast feedback would matter more to me than tiny rubric details.",
+    "parentId": "ex302"
+  },
+  {
+    "id": "ex305",
+    "author": "Maya",
+    "timestamp": "2026-04-23T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex306",
+    "author": "Victor",
+    "timestamp": "2026-04-25T16:00:00Z",
+    "text": "Should participation in discussion count more toward the final grade?",
+    "parentId": null
+  },
+  {
+    "id": "ex307",
+    "author": "Noah",
+    "timestamp": "2026-04-25T16:03:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex306"
+  },
+  {
+    "id": "ex308",
+    "author": "Olivia",
+    "timestamp": "2026-04-25T16:08:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex306"
+  },
+  {
+    "id": "ex309",
+    "author": "Paul",
+    "timestamp": "2026-04-25T16:15:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex306"
+  },
+  {
+    "id": "ex310",
+    "author": "Quinn",
+    "timestamp": "2026-04-25T16:24:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex309"
+  },
+  {
+    "id": "ex311",
+    "author": "Noah",
+    "timestamp": "2026-04-25T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex312",
+    "author": "Rita",
+    "timestamp": "2026-04-25T16:29:00Z",
+    "text": "From my experience, i like participation points when they reward preparation rather than volume.",
+    "parentId": "ex306"
+  },
+  {
+    "id": "ex313",
+    "author": "Sam",
+    "timestamp": "2026-04-25T16:34:00Z",
+    "text": "I think participation should include online responses, not just speaking in class.",
+    "parentId": "ex310"
+  },
+  {
+    "id": "ex314",
+    "author": "Tina",
+    "timestamp": "2026-04-25T16:41:00Z",
+    "text": "I agree. Increasing participation weight could disadvantage quieter students.",
+    "parentId": "ex313"
+  },
+  {
+    "id": "ex315",
+    "author": "Uma",
+    "timestamp": "2026-04-25T16:50:00Z",
+    "text": "I disagree a bit. Forum posts would be a better way to measure engagement fairly.",
+    "parentId": "ex313"
+  },
+  {
+    "id": "ex316",
+    "author": "Rita",
+    "timestamp": "2026-04-25T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex317",
+    "author": "Victor",
+    "timestamp": "2026-04-25T16:55:00Z",
+    "text": "Maybe a better compromise is this: A broader definition of participation would make this feel more inclusive.",
+    "parentId": "ex306"
+  },
+  {
+    "id": "ex318",
+    "author": "Wendy",
+    "timestamp": "2026-04-27T17:00:00Z",
+    "text": "Can we move the project checkpoint deadline by two days?",
+    "parentId": null
+  },
+  {
+    "id": "ex319",
+    "author": "Quinn",
+    "timestamp": "2026-04-27T17:03:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex318"
+  },
+  {
+    "id": "ex320",
+    "author": "Rita",
+    "timestamp": "2026-04-27T17:08:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex318"
+  },
+  {
+    "id": "ex321",
+    "author": "Sam",
+    "timestamp": "2026-04-27T17:15:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex318"
+  },
+  {
+    "id": "ex322",
+    "author": "Tina",
+    "timestamp": "2026-04-27T17:24:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex321"
+  },
+  {
+    "id": "ex323",
+    "author": "Sam",
+    "timestamp": "2026-04-27T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex324",
+    "author": "Uma",
+    "timestamp": "2026-04-27T17:29:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex318"
+  },
+  {
+    "id": "ex325",
+    "author": "Victor",
+    "timestamp": "2026-04-27T17:34:00Z",
+    "text": "A short extension would really help teams still debugging deployment.",
+    "parentId": "ex322"
+  },
+  {
+    "id": "ex326",
+    "author": "Wendy",
+    "timestamp": "2026-04-27T17:41:00Z",
+    "text": "I agree. I would rather reduce the scope than move the deadline again.",
+    "parentId": "ex325"
+  },
+  {
+    "id": "ex327",
+    "author": "Xavier",
+    "timestamp": "2026-04-27T17:50:00Z",
+    "text": "I disagree a bit. Many groups planned around the original schedule, so changing it now could be messy.",
+    "parentId": "ex325"
+  },
+  {
+    "id": "ex328",
+    "author": "Wendy",
+    "timestamp": "2026-04-27T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex329",
+    "author": "Yara",
+    "timestamp": "2026-04-27T17:55:00Z",
+    "text": "Maybe a better compromise is this: The checkpoint would feel more reasonable with narrower requirements.",
+    "parentId": "ex318"
+  },
+  {
+    "id": "ex330",
+    "author": "Zane",
+    "timestamp": "2026-04-27T18:00:00Z",
+    "text": "From my experience, a two-day shift could make a big difference for teams balancing other exams.",
+    "parentId": "ex329"
+  },
+  {
+    "id": "ex331",
+    "author": "Xavier",
+    "timestamp": "2026-04-29T18:00:00Z",
+    "text": "Would it be possible to record review sessions for students who cannot attend live?",
+    "parentId": null
+  },
+  {
+    "id": "ex332",
+    "author": "Tina",
+    "timestamp": "2026-04-29T18:03:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex331"
+  },
+  {
+    "id": "ex333",
+    "author": "Uma",
+    "timestamp": "2026-04-29T18:08:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex331"
+  },
+  {
+    "id": "ex334",
+    "author": "Victor",
+    "timestamp": "2026-04-29T18:15:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex331"
+  },
+  {
+    "id": "ex335",
+    "author": "Wendy",
+    "timestamp": "2026-04-29T18:24:00Z",
+    "text": "Maybe a better compromise is this: I have found office hours useful, but the current schedule is too limited.",
+    "parentId": "ex334"
+  },
+  {
+    "id": "ex336",
+    "author": "Xavier",
+    "timestamp": "2026-04-29T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex337",
+    "author": "Xavier",
+    "timestamp": "2026-04-29T18:29:00Z",
+    "text": "From my experience, could we add one virtual session each week for commuting students?",
+    "parentId": "ex331"
+  },
+  {
+    "id": "ex338",
+    "author": "Yara",
+    "timestamp": "2026-04-29T18:34:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex335"
+  },
+  {
+    "id": "ex339",
+    "author": "Zane",
+    "timestamp": "2026-04-29T18:41:00Z",
+    "text": "I agree. An evening slot would help students who have labs during the day.",
+    "parentId": "ex338"
+  },
+  {
+    "id": "ex340",
+    "author": "Amy",
+    "timestamp": "2026-04-29T18:50:00Z",
+    "text": "I disagree a bit. More office hours before exams would lower stress a lot.",
+    "parentId": "ex338"
+  },
+  {
+    "id": "ex341",
+    "author": "Ben",
+    "timestamp": "2026-04-29T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex342",
+    "author": "Ben",
+    "timestamp": "2026-04-29T18:55:00Z",
+    "text": "Maybe a better compromise is this: I have found office hours useful, but the current schedule is too limited.",
+    "parentId": "ex331"
+  },
+  {
+    "id": "ex343",
+    "author": "Clara",
+    "timestamp": "2026-04-29T19:00:00Z",
+    "text": "From my experience, could we add one virtual session each week for commuting students?",
+    "parentId": "ex342"
+  },
+  {
+    "id": "ex344",
+    "author": "Derek",
+    "timestamp": "2026-04-29T19:07:00Z",
+    "text": "Office hours fill up too quickly before deadlines.",
+    "parentId": "ex342"
+  },
+  {
+    "id": "ex345",
+    "author": "Yara",
+    "timestamp": "2026-05-01T14:00:00Z",
+    "text": "What do people think about adding more office hours before the midterm?",
+    "parentId": null
+  },
+  {
+    "id": "ex346",
+    "author": "Wendy",
+    "timestamp": "2026-05-01T14:03:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex345"
+  },
+  {
+    "id": "ex347",
+    "author": "Xavier",
+    "timestamp": "2026-05-01T14:08:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex345"
+  },
+  {
+    "id": "ex348",
+    "author": "Yara",
+    "timestamp": "2026-05-01T14:15:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex345"
+  },
+  {
+    "id": "ex349",
+    "author": "Zane",
+    "timestamp": "2026-05-01T14:24:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex348"
+  },
+  {
+    "id": "ex350",
+    "author": "Clara",
+    "timestamp": "2026-05-01T14:26:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex351",
+    "author": "Amy",
+    "timestamp": "2026-05-01T14:29:00Z",
+    "text": "From my experience, i would especially value recordings if they included problem walkthroughs.",
+    "parentId": "ex345"
+  },
+  {
+    "id": "ex352",
+    "author": "Ben",
+    "timestamp": "2026-05-01T14:34:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex349"
+  },
+  {
+    "id": "ex353",
+    "author": "Clara",
+    "timestamp": "2026-05-01T14:41:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex352"
+  },
+  {
+    "id": "ex354",
+    "author": "Derek",
+    "timestamp": "2026-05-01T14:50:00Z",
+    "text": "I disagree a bit. Accessibility alone feels like a strong reason to record them.",
+    "parentId": "ex352"
+  },
+  {
+    "id": "ex355",
+    "author": "Gavin",
+    "timestamp": "2026-05-01T14:52:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex356",
+    "author": "Elena",
+    "timestamp": "2026-05-01T14:55:00Z",
+    "text": "Maybe a better compromise is this: Recordings would help people revisit confusing parts before exams.",
+    "parentId": "ex345"
+  },
+  {
+    "id": "ex357",
+    "author": "Farah",
+    "timestamp": "2026-05-01T15:00:00Z",
+    "text": "From my experience, i would especially value recordings if they included problem walkthroughs.",
+    "parentId": "ex356"
+  },
+  {
+    "id": "ex358",
+    "author": "Gavin",
+    "timestamp": "2026-05-01T15:07:00Z",
+    "text": "Recorded review sessions would help students with conflicts.",
+    "parentId": "ex356"
+  },
+  {
+    "id": "ex359",
+    "author": "Hannah",
+    "timestamp": "2026-05-01T15:16:00Z",
+    "text": "I agree. Worked examples are more useful than just posting slides afterward.",
+    "parentId": "ex356"
+  },
+  {
+    "id": "ex360",
+    "author": "Zane",
+    "timestamp": "2026-05-03T15:00:00Z",
+    "text": "How useful have the discussion boards been for understanding the material?",
+    "parentId": null
+  },
+  {
+    "id": "ex361",
+    "author": "Zane",
+    "timestamp": "2026-05-03T15:03:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex362",
+    "author": "Amy",
+    "timestamp": "2026-05-03T15:08:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex363",
+    "author": "Ben",
+    "timestamp": "2026-05-03T15:15:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex364",
+    "author": "Clara",
+    "timestamp": "2026-05-03T15:24:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex363"
+  },
+  {
+    "id": "ex365",
+    "author": "Hannah",
+    "timestamp": "2026-05-03T15:26:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex366",
+    "author": "Derek",
+    "timestamp": "2026-05-03T15:29:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex367",
+    "author": "Elena",
+    "timestamp": "2026-05-03T15:34:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex364"
+  },
+  {
+    "id": "ex368",
+    "author": "Farah",
+    "timestamp": "2026-05-03T15:41:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex367"
+  },
+  {
+    "id": "ex369",
+    "author": "Gavin",
+    "timestamp": "2026-05-03T15:50:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex367"
+  },
+  {
+    "id": "ex370",
+    "author": "Lily",
+    "timestamp": "2026-05-03T15:52:00Z",
+    "text": "That suggestion would solve the issue for a lot of students.",
+    "parentId": null
+  },
+  {
+    "id": "ex371",
+    "author": "Hannah",
+    "timestamp": "2026-05-03T15:55:00Z",
+    "text": "Maybe a better compromise is this: I learn a lot from seeing how other students phrase questions.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex372",
+    "author": "Ian",
+    "timestamp": "2026-05-03T16:00:00Z",
+    "text": "From my experience, searchability matters because similar questions keep coming up.",
+    "parentId": "ex371"
+  },
+  {
+    "id": "ex373",
+    "author": "Jasmine",
+    "timestamp": "2026-05-03T16:07:00Z",
+    "text": "The discussion board is helpful when people post concrete examples.",
+    "parentId": "ex371"
+  },
+  {
+    "id": "ex374",
+    "author": "Kevin",
+    "timestamp": "2026-05-03T16:16:00Z",
+    "text": "I agree. It becomes much less useful when questions go unanswered for days.",
+    "parentId": "ex371"
+  },
+  {
+    "id": "ex375",
+    "author": "Lily",
+    "timestamp": "2026-05-03T16:19:00Z",
+    "text": "I disagree a bit. Pinned summary answers would make the board easier to navigate.",
+    "parentId": "ex360"
+  },
+  {
+    "id": "ex376",
+    "author": "Amy",
+    "timestamp": "2026-05-05T16:00:00Z",
+    "text": "Should we have more worked examples in lecture?",
+    "parentId": null
+  },
+  {
+    "id": "ex377",
+    "author": "Clara",
+    "timestamp": "2026-05-05T16:03:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex378",
+    "author": "Derek",
+    "timestamp": "2026-05-05T16:08:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex379",
+    "author": "Elena",
+    "timestamp": "2026-05-05T16:15:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex380",
+    "author": "Farah",
+    "timestamp": "2026-05-05T16:24:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex379"
+  },
+  {
+    "id": "ex381",
+    "author": "Miles",
+    "timestamp": "2026-05-05T16:26:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex382",
+    "author": "Gavin",
+    "timestamp": "2026-05-05T16:29:00Z",
+    "text": "From my experience, examples are especially important in the weeks with new notation.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex383",
+    "author": "Hannah",
+    "timestamp": "2026-05-05T16:34:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex380"
+  },
+  {
+    "id": "ex384",
+    "author": "Ian",
+    "timestamp": "2026-05-05T16:41:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex383"
+  },
+  {
+    "id": "ex385",
+    "author": "Jasmine",
+    "timestamp": "2026-05-05T16:50:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex383"
+  },
+  {
+    "id": "ex386",
+    "author": "Quentin",
+    "timestamp": "2026-05-05T16:52:00Z",
+    "text": "This is why I support changing the policy.",
+    "parentId": null
+  },
+  {
+    "id": "ex387",
+    "author": "Kevin",
+    "timestamp": "2026-05-05T16:55:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex388",
+    "author": "Lily",
+    "timestamp": "2026-05-05T17:00:00Z",
+    "text": "From my experience, examples are especially important in the weeks with new notation.",
+    "parentId": "ex387"
+  },
+  {
+    "id": "ex389",
+    "author": "Miles",
+    "timestamp": "2026-05-05T17:07:00Z",
+    "text": "More worked examples in lecture would make the abstract ideas clearer.",
+    "parentId": "ex387"
+  },
+  {
+    "id": "ex390",
+    "author": "Nina",
+    "timestamp": "2026-05-05T17:16:00Z",
+    "text": "I agree. I understand concepts better when I see a full problem solved live.",
+    "parentId": "ex387"
+  },
+  {
+    "id": "ex391",
+    "author": "Owen",
+    "timestamp": "2026-05-05T17:19:00Z",
+    "text": "I disagree a bit. Worked examples would help connect theory to the homework.",
+    "parentId": "ex376"
+  },
+  {
+    "id": "ex392",
+    "author": "Priya",
+    "timestamp": "2026-05-05T17:24:00Z",
+    "text": "Maybe a better compromise is this: Short practice pauses during lecture could be even more useful.",
+    "parentId": "ex390"
+  },
+  {
+    "id": "ex393",
+    "author": "Ben",
+    "timestamp": "2026-05-07T17:00:00Z",
+    "text": "Is the pacing of the class too fast right now?",
+    "parentId": null
+  },
+  {
+    "id": "ex394",
+    "author": "Farah",
+    "timestamp": "2026-05-07T17:03:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex393"
+  },
+  {
+    "id": "ex395",
+    "author": "Gavin",
+    "timestamp": "2026-05-07T17:08:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex393"
+  },
+  {
+    "id": "ex396",
+    "author": "Hannah",
+    "timestamp": "2026-05-07T17:15:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex393"
+  },
+  {
+    "id": "ex397",
+    "author": "Ian",
+    "timestamp": "2026-05-07T17:24:00Z",
+    "text": "Maybe a better compromise is this: I think the pacing is fine, but the homework amplifies the pressure.",
+    "parentId": "ex396"
+  },
+  {
+    "id": "ex398",
+    "author": "Renee",
+    "timestamp": "2026-05-07T17:26:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex399",
+    "author": "Jasmine",
+    "timestamp": "2026-05-07T17:29:00Z",
+    "text": "From my experience, a small slowdown around the midterm would help a lot.",
+    "parentId": "ex393"
+  },
+  {
+    "id": "ex400",
+    "author": "Kevin",
+    "timestamp": "2026-05-07T17:34:00Z",
+    "text": "The pacing feels fast once multiple deadlines land in the same week.",
+    "parentId": "ex397"
+  },
+  {
+    "id": "ex401",
+    "author": "Lily",
+    "timestamp": "2026-05-07T17:41:00Z",
+    "text": "I agree. I can follow the lectures, but review materials arrive too late.",
+    "parentId": "ex400"
+  },
+  {
+    "id": "ex402",
+    "author": "Miles",
+    "timestamp": "2026-05-07T17:50:00Z",
+    "text": "I disagree a bit. The class pace would feel better with a short recap each week.",
+    "parentId": "ex400"
+  },
+  {
+    "id": "ex403",
+    "author": "Vera",
+    "timestamp": "2026-05-07T17:52:00Z",
+    "text": "That is exactly why clearer expectations would help.",
+    "parentId": null
+  },
+  {
+    "id": "ex404",
+    "author": "Clara",
+    "timestamp": "2026-05-09T18:00:00Z",
+    "text": "What would make group projects feel more fair this semester?",
+    "parentId": null
+  },
+  {
+    "id": "ex405",
+    "author": "Ian",
+    "timestamp": "2026-05-09T18:03:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex404"
+  },
+  {
+    "id": "ex406",
+    "author": "Jasmine",
+    "timestamp": "2026-05-09T18:08:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex404"
+  },
+  {
+    "id": "ex407",
+    "author": "Kevin",
+    "timestamp": "2026-05-09T18:15:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex404"
+  },
+  {
+    "id": "ex408",
+    "author": "Lily",
+    "timestamp": "2026-05-09T18:24:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex407"
+  },
+  {
+    "id": "ex409",
+    "author": "Will",
+    "timestamp": "2026-05-09T18:26:00Z",
+    "text": "I think that concern matters more than people realize.",
+    "parentId": null
+  },
+  {
+    "id": "ex410",
+    "author": "Miles",
+    "timestamp": "2026-05-09T18:29:00Z",
+    "text": "From my experience, i think projects work best when there are visible roles and deadlines.",
+    "parentId": "ex404"
+  },
+  {
+    "id": "ex411",
+    "author": "Nina",
+    "timestamp": "2026-05-09T18:34:00Z",
+    "text": "Clearer task division would make group projects feel more fair.",
+    "parentId": "ex408"
+  },
+  {
+    "id": "ex412",
+    "author": "Owen",
+    "timestamp": "2026-05-09T18:41:00Z",
+    "text": "I agree. It is hard when one person ends up doing most of the integration work.",
+    "parentId": "ex411"
+  },
+  {
+    "id": "ex413",
+    "author": "Priya",
+    "timestamp": "2026-05-09T18:50:00Z",
+    "text": "I disagree a bit. Peer evaluations help, but they do not solve workload imbalance fully.",
+    "parentId": "ex411"
+  },
+  {
+    "id": "ex414",
+    "author": "Professor Johnson",
+    "timestamp": "2026-05-09T18:52:00Z",
+    "text": "This is basically the same problem I ran into last week.",
+    "parentId": null
+  },
+  {
+    "id": "ex415",
+    "author": "Quentin",
+    "timestamp": "2026-05-09T18:55:00Z",
+    "text": "Maybe a better compromise is this: Milestones with clearer expectations would reduce team confusion.",
+    "parentId": "ex404"
+  },
+  {
+    "id": "ex416",
+    "author": "Professor Johnson",
+    "timestamp": "2026-05-21T14:00:00Z",
+    "text": "For the final project, what would help your team make better progress over the next two weeks?",
+    "parentId": null
+  },
+  {
+    "id": "ex417",
+    "author": "Grace",
+    "timestamp": "2026-05-21T14:04:00Z",
+    "text": "A clearer milestone breakdown would help us stay aligned.",
+    "parentId": "ex416"
+  },
+  {
+    "id": "ex418",
+    "author": "Henry",
+    "timestamp": "2026-05-21T14:08:00Z",
+    "text": "We mostly struggle with integration, not with individual tasks.",
+    "parentId": "ex417"
+  },
+  {
+    "id": "ex419",
+    "author": "Isabella",
+    "timestamp": "2026-05-21T14:12:00Z",
+    "text": "Our biggest blocker is that frontend and backend assumptions keep drifting apart.",
+    "parentId": "ex418"
+  },
+  {
+    "id": "ex420",
+    "author": "Jack",
+    "timestamp": "2026-05-21T14:16:00Z",
+    "text": "A short check-in on API expectations would probably save us hours.",
+    "parentId": "ex416"
+  },
+  {
+    "id": "ex421",
+    "author": "Karen",
+    "timestamp": "2026-05-21T14:20:00Z",
+    "text": "I think the checkpoint should focus on end-to-end functionality, even if styling is incomplete.",
+    "parentId": "ex420"
+  },
+  {
+    "id": "ex422",
+    "author": "Leo",
+    "timestamp": "2026-05-21T14:24:00Z",
+    "text": "We also lost time because the API quota blocked repeated testing.",
+    "parentId": "ex421"
+  },
+  {
+    "id": "ex423",
+    "author": "Maya",
+    "timestamp": "2026-05-21T14:28:00Z",
+    "text": "A written sample dataset with expected outputs would make debugging easier.",
+    "parentId": "ex416"
+  },
+  {
+    "id": "ex424",
+    "author": "Noah",
+    "timestamp": "2026-05-21T14:32:00Z",
+    "text": "The thread map works, but we still need better evidence that it helps more than normal chat.",
+    "parentId": "ex423"
+  },
+  {
+    "id": "ex425",
+    "author": "Olivia",
+    "timestamp": "2026-05-21T14:36:00Z",
+    "text": "A larger dataset would make the usefulness of the graph much clearer in the demo.",
+    "parentId": "ex424"
+  },
+  {
+    "id": "ex426",
+    "author": "Paul",
+    "timestamp": "2026-05-21T14:40:00Z",
+    "text": "We should show one messy thread in chat and then switch to graph to make the contrast obvious.",
+    "parentId": "ex416"
+  },
+  {
+    "id": "ex427",
+    "author": "Quinn",
+    "timestamp": "2026-05-21T14:44:00Z",
+    "text": "Topic filtering is probably the next most practical improvement after timeline filtering.",
+    "parentId": "ex426"
+  },
+  {
+    "id": "ex428",
+    "author": "Rita",
+    "timestamp": "2026-05-21T14:48:00Z",
+    "text": "Clickable insight cards would make the interface feel smarter without overbuilding it.",
+    "parentId": "ex427"
+  },
+  {
+    "id": "ex429",
+    "author": "Sam",
+    "timestamp": "2026-05-21T14:52:00Z",
+    "text": "A most controversial thread card would give the graders something instantly understandable.",
+    "parentId": "ex416"
+  },
+  {
+    "id": "ex430",
+    "author": "Tina",
+    "timestamp": "2026-05-21T14:56:00Z",
+    "text": "I also think summary panels should point users toward what to inspect next.",
+    "parentId": "ex429"
+  },
+  {
+    "id": "ex431",
+    "author": "Uma",
+    "timestamp": "2026-05-21T15:00:00Z",
+    "text": "The live demo needs a clearer story from overview to evidence.",
+    "parentId": "ex430"
+  }
+]
