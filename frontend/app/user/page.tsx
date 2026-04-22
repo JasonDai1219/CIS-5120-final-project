@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import UserThreadMapView from "../components/UserThreadMapView";
-import TimeSlider from "../components/TimeSlider";
+import UserChatView from "../components/UserChatView";
+import UserHeader from "../components/UserHeader";
+import UserFooter from "../components/UserFooter";
+import UserMessageDetailSheet from "../components/UserMessageDetailSheet";
 
 type Message = {
   id: string;
@@ -18,43 +21,6 @@ type Message = {
 
 type TimeGranularity = "day" | "week" | "month";
 type TimeRange = { start: string; end: string } | null;
-
-function sentimentBadgeClass(sentiment?: string) {
-  switch (sentiment) {
-    case "supportive":
-      return "bg-green-100 text-green-800";
-    case "critical":
-      return "bg-red-100 text-red-800";
-    case "mixed":
-      return "bg-yellow-100 text-yellow-800";
-    default:
-      return "bg-gray-100 text-gray-700";
-  }
-}
-
-function formatBucketLabel(bucket: string, granularity: TimeGranularity) {
-  if (granularity === "day") {
-    const [, month, day] = bucket.split("-");
-    return `${month}/${day}`;
-  }
-
-  if (granularity === "week") {
-    const [, month, day] = bucket.split("-");
-    return `Week ${month}/${day}`;
-  }
-
-  const [year, month] = bucket.split("-");
-  return `${month}/${year}`;
-}
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 function getDayKey(timestamp: string) {
   return timestamp.slice(0, 10);
@@ -82,6 +48,10 @@ function compareBuckets(a: string, b: string) {
   return a.localeCompare(b);
 }
 
+function initials(name: string) {
+  return name.split(" ").map((p) => p[0] ?? "").join("").slice(0, 2).toUpperCase();
+}
+
 function getEffectiveParentId(msg: Message) {
   return msg.parentId ?? msg.inferredReplyToId ?? null;
 }
@@ -89,6 +59,17 @@ function getEffectiveParentId(msg: Message) {
 function isAiOnlyReply(msg: Message) {
   return !msg.parentId && !!msg.inferredReplyToId && !!msg.replyInferred;
 }
+
+function sentimentBadgeClass(sentiment?: string) {
+  switch (sentiment) {
+    case "supportive": return "bg-green-100 text-green-800";
+    case "critical":   return "bg-red-100 text-red-800";
+    case "mixed":      return "bg-yellow-100 text-yellow-800";
+    default:           return "bg-gray-100 text-gray-700";
+  }
+}
+
+
 
 export default function UserAppPage() {
   const [datasetIds, setDatasetIds] = useState<string[]>([]);
@@ -109,7 +90,6 @@ export default function UserAppPage() {
   const [sliderLow, setSliderLow] = useState(0);
   const [sliderHigh, setSliderHigh] = useState(1);
 
-  const chatScrollRef = useRef<HTMLDivElement | null>(null);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const scrollToMessage = (messageId: string) => {
@@ -125,8 +105,6 @@ export default function UserAppPage() {
       target.classList.remove("ring-2", "ring-[#7A9B6E]", "ring-offset-2");
     }, 1200);
   };
-
-  const isTopicSelected = (topic: string) => selectedTopics.includes(topic);
 
   const toggleTopicSelection = (topic: string) => {
     setSelectedTopics((prev) =>
@@ -445,455 +423,105 @@ export default function UserAppPage() {
   };
 
   const parentMessage = selectedMessage
-    ? messagesById[getEffectiveParentId(selectedMessage) ?? ""]
+    ? (messagesById[getEffectiveParentId(selectedMessage) ?? ""] ?? null)
     : null;
+
 
   return (
     <main className="h-dvh overflow-hidden bg-[#e8ede6]">
-      <div className="relative mx-auto h-full w-full max-w-[430px] overflow-hidden bg-[#fafaf8] md:shadow-sm">
-        <div className="grid h-full min-w-0 grid-rows-[200px_minmax(0,1fr)_200px]">
-          {/* Header */}
-          <div className="h-[200px] overflow-hidden border-b border-[#d4ddd0] px-5 pt-4 pb-3">
-            <div className="flex h-full min-h-0 flex-col gap-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-[15px] font-semibold tracking-[-0.3px] text-[#2B3A2B]">
-                  Thread Map
-                </div>
+      <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#fafaf8] md:shadow-sm">
+        <UserHeader
+          datasetIds={datasetIds}
+          selectedDataset={selectedDataset}
+          onSelectDataset={setSelectedDataset}
+          timeGranularity={timeGranularity}
+          onChangeGranularity={setTimeGranularity}
+          availableTimeBuckets={availableTimeBuckets}
+          usableTimeBuckets={usableTimeBuckets}
+          sliderLow={sliderLow}
+          sliderHigh={sliderHigh}
+          onSliderChange={(lo, hi) => {
+            setSliderLow(lo);
+            setSliderHigh(hi);
 
-                {datasetIds.length > 1 && (
-                  <div className="relative shrink-0">
-                    <select
-                      value={selectedDataset}
-                      onChange={(e) => setSelectedDataset(e.target.value)}
-                      className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
-                    >
-                      {datasetIds.map((id) => (
-                        <option key={id} value={id}>
-                          {id}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
+            if (usableTimeBuckets.length === 0) {
+              setSelectedTimeRange(null);
+              return;
+            }
 
-              <div className="flex items-center gap-2">
-                <label className="shrink-0 text-[11px] font-medium text-[#5C7A4E]">
-                  Group by
-                </label>
+            const startBucket = usableTimeBuckets[lo];
+            const endBucket = usableTimeBuckets[hi - 1];
 
-                <div className="relative shrink-0">
-                  <select
-                    value={timeGranularity}
-                    onChange={(e) =>
-                      setTimeGranularity(e.target.value as TimeGranularity)
+            if (!startBucket || !endBucket) {
+              setSelectedTimeRange(null);
+              return;
+            }
+
+            setSelectedTimeRange({
+              start: startBucket,
+              end: endBucket,
+            });
+          }}
+          availableTopics={availableTopics}
+          selectedTopics={selectedTopics}
+          onToggleTopic={toggleTopicSelection}
+          onClearTopics={() => setSelectedTopics([])}
+          viewMode={viewMode}
+          onChangeViewMode={setViewMode}
+        />
+
+        <div className="min-h-0 flex-1 overflow-hidden pb-36">
+          {error ? (
+            <div className="p-4 text-sm text-red-700">{error}</div>
+          ) : viewMode === "map" ? (
+            <div className="h-full min-h-0 overflow-hidden px-2 py-2">
+              <div className="h-full overflow-hidden rounded-xl">
+                <UserThreadMapView
+                  messages={graphMessages}
+                  selectedMessageId={selectedMessage?.id ?? null}
+                  onSelectMessage={(id) => {
+                    const msg = topicFilteredMessages.find((m) => m.id === id);
+                    if (msg) {
+                      setSelectedMessage(msg);
+                      setSheetOpen(true);
                     }
-                    className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
-                  >
-                    <option value="day">Daily</option>
-                    <option value="week">Weekly</option>
-                    <option value="month">Monthly</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="shrink-0" style={{ overflow: "visible" }}>
-                <TimeSlider
-                  segments={Math.max(
-                    availableTimeBuckets.filter((b) => b !== "all").length,
-                    1
-                  )}
-                  low={sliderLow}
-                  high={sliderHigh}
-                  onChange={(lo, hi) => {
-                    const usableBuckets = availableTimeBuckets.filter(
-                      (b) => b !== "all"
-                    );
-
-                    setSliderLow(lo);
-                    setSliderHigh(hi);
-
-                    if (usableBuckets.length === 0) {
-                      setSelectedTimeRange(null);
-                      return;
-                    }
-
-                    const startBucket = usableBuckets[lo];
-                    const endBucket = usableBuckets[hi - 1];
-
-                    if (!startBucket || !endBucket) {
-                      setSelectedTimeRange(null);
-                      return;
-                    }
-
-                    setSelectedTimeRange({
-                      start: startBucket,
-                      end: endBucket,
-                    });
                   }}
                 />
               </div>
-
-              <div className="flex items-center justify-center gap-2">
-                <select
-                  value={usableTimeBuckets[sliderLow] ?? ""}
-                  onChange={(e) => {
-                    const nextLow = usableTimeBuckets.indexOf(e.target.value);
-                    if (nextLow === -1) return;
-
-                    const nextHigh = Math.max(sliderHigh, nextLow + 1);
-                    setSliderLow(nextLow);
-                    setSliderHigh(nextHigh);
-
-                    const startBucket = usableTimeBuckets[nextLow];
-                    const endBucket = usableTimeBuckets[nextHigh - 1];
-
-                    if (startBucket && endBucket) {
-                      setSelectedTimeRange({
-                        start: startBucket,
-                        end: endBucket,
-                      });
-                    }
-                  }}
-                  className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
-                >
-                  {usableTimeBuckets.map((bucket, index) => (
-                    <option
-                      key={bucket}
-                      value={bucket}
-                      disabled={index >= sliderHigh}
-                    >
-                      {formatBucketLabel(bucket, timeGranularity)}
-                    </option>
-                  ))}
-                </select>
-
-                <span className="text-[11px] font-medium text-[#5C7A4E]">
-                  to
-                </span>
-
-                <select
-                  value={usableTimeBuckets[sliderHigh - 1] ?? ""}
-                  onChange={(e) => {
-                    const endIndex = usableTimeBuckets.indexOf(e.target.value);
-                    if (endIndex === -1) return;
-
-                    const nextHigh = endIndex + 1;
-                    const nextLow = Math.min(sliderLow, endIndex);
-
-                    setSliderLow(nextLow);
-                    setSliderHigh(nextHigh);
-
-                    const startBucket = usableTimeBuckets[nextLow];
-                    const endBucket = usableTimeBuckets[nextHigh - 1];
-
-                    if (startBucket && endBucket) {
-                      setSelectedTimeRange({
-                        start: startBucket,
-                        end: endBucket,
-                      });
-                    }
-                  }}
-                  className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
-                >
-                  {usableTimeBuckets.map((bucket, index) => (
-                    <option
-                      key={bucket}
-                      value={bucket}
-                      disabled={index < sliderLow}
-                    >
-                      {formatBucketLabel(bucket, timeGranularity)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="-mx-5 h-[38px] min-w-0 overflow-x-auto overflow-y-hidden px-5 scrollbar-thin">
-                <div className="flex w-max gap-1.5 pr-5">
-                  <button
-                    onClick={() => setSelectedTopics([])}
-                    className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap ${
-                      selectedTopics.length === 0
-                        ? "border-[#3D6B35] bg-[#3D6B35] text-[#f5f8f2]"
-                        : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
-                    }`}
-                  >
-                    All topics
-                  </button>
-
-                  {availableTopics.map((topic) => (
-                    <button
-                      key={topic}
-                      onClick={() => toggleTopicSelection(topic)}
-                      className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap ${
-                        isTopicSelected(topic)
-                          ? "border-[#3D6B35] bg-[#3D6B35] text-[#f5f8f2]"
-                          : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
-                      }`}
-                    >
-                      {topic}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-auto">
-                <div className="flex w-full rounded-full bg-[#e4ebe0] p-0.5">
-                  <button
-                    onClick={() => setViewMode("map")}
-                    className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition ${
-                      viewMode === "map"
-                        ? "bg-[#fafaf8] text-[#2B3A2B]"
-                        : "bg-transparent text-[#7A9B6E]"
-                    }`}
-                  >
-                    Thread Map
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode("chat")}
-                    className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition ${
-                      viewMode === "chat"
-                        ? "bg-[#fafaf8] text-[#2B3A2B]"
-                        : "bg-transparent text-[#7A9B6E]"
-                    }`}
-                  >
-                    Chat View
-                  </button>
-                </div>
-              </div>
             </div>
-          </div>
-
-          {/* Main content */}
-          <div className="min-h-0 overflow-hidden">
-            {error ? (
-              <div className="p-4 text-sm text-red-700">{error}</div>
-            ) : viewMode === "map" ? (
-              <div className="h-full min-h-0 overflow-hidden px-2 py-2">
-                <div className="h-full overflow-hidden rounded-xl">
-                  <UserThreadMapView
-                    messages={graphMessages}
-                    selectedMessageId={selectedMessage?.id ?? null}
-                    onSelectMessage={(id) => {
-                      const msg = topicFilteredMessages.find((m) => m.id === id);
-                      if (msg) {
-                        setSelectedMessage(msg);
-                        setSheetOpen(true);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                ref={chatScrollRef}
-                className="h-full overflow-y-auto overflow-x-hidden px-4 py-3 flex flex-col justify-end"
-              >
-                <div className="flex min-w-0 flex-col gap-2 pb-4">
-                  {topicFilteredMessages.map((msg) => {
-                    const parent = messagesById[getEffectiveParentId(msg) ?? ""];
-                    const inferred = isAiOnlyReply(msg);
-
-                    return (
-                      <div
-                        key={msg.id}
-                        ref={(el) => {
-                          messageRefs.current[msg.id] = el;
-                        }}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => openMessage(msg)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            openMessage(msg);
-                          }
-                        }}
-                        className="flex min-w-0 cursor-pointer items-start gap-2 rounded-[12px] text-left transition"
-                      >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#d6e0d2] text-[10px] font-semibold text-[#2B3A2B]">
-                          {initials(msg.author)}
-                        </div>
-
-                        <div className="min-w-0 max-w-[260px] rounded-[16px] rounded-bl-[4px] bg-[#eef2eb] px-3 py-2">
-                          {parent && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                jumpToParentMessage(parent, msg);
-                              }}
-                              className="mb-2 block w-full min-w-0 rounded-[10px] bg-[#dfe8d8] px-2.5 py-2 text-left"
-                            >
-                              <div className="flex min-w-0 items-center gap-1 text-[10px] font-medium text-[#5C7A4E]">
-                                <span className="truncate">
-                                  Replying to {parent.author}
-                                </span>
-                                {inferred && (
-                                  <span
-                                    className="shrink-0"
-                                    title="AI-inferred reply"
-                                  >
-                                    ★
-                                  </span>
-                                )}
-                              </div>
-                              <div className="truncate text-[10px] text-[#7c8f70]">
-                                {parent.text}
-                              </div>
-                            </button>
-                          )}
-
-                          <div className="mb-1 text-[11px] font-semibold text-[#3D6B35]">
-                            {msg.author}
-                          </div>
-
-                          <div className="break-words text-[13px] leading-[1.45] text-[#2B3A2B]">
-                            {msg.text}
-                          </div>
-
-                          <div className="mt-1.5 flex min-w-0 items-center gap-1.5">
-                            <span className="shrink-0 text-[10px] text-[#8BA07A]">
-                              {new Date(msg.timestamp).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                            <span
-                              className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium ${sentimentBadgeClass(
-                                msg.sentiment
-                              )}`}
-                            >
-                              {msg.sentiment ?? "neutral"}
-                            </span>
-                            {inferred && (
-                              <span
-                                className="shrink-0 text-[10px] text-[#5C7A4E]"
-                                title="AI-inferred reply"
-                              >
-                                ★
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="h-[200px] overflow-hidden border-t border-[#d4ddd0] px-4 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)]">
-            <div className="flex h-full min-h-0 flex-col">
-              <div className="mb-2 flex gap-2">
-                {[
-                  { value: topicFilteredMessages.length, label: "messages" },
-                  { value: roots, label: "threads" },
-                  { value: depth, label: "depth" },
-                ].map(({ value, label }) => (
-                  <div
-                    key={label}
-                    className="flex-1 rounded-[10px] bg-[#e4ebe0] px-2 py-1.5"
-                  >
-                    <div className="text-base font-semibold text-[#2B3A2B]">
-                      {value}
-                    </div>
-                    <div className="text-[9px] uppercase tracking-[.04em] text-[#8BA07A]">
-                      {label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="whitespace-nowrap text-[10px] font-medium uppercase tracking-[.04em] text-[#8BA07A]">
-                  Sentiment
-                </span>
-                <div className="flex h-2 flex-1 overflow-hidden rounded-full">
-                  <div
-                    className="h-full bg-[#4A9B4A]"
-                    style={{ width: `${sentimentLine.supportivePct}%` }}
-                  />
-                  <div
-                    className="h-full bg-[#E07820]"
-                    style={{ width: `${sentimentLine.neutralPct}%` }}
-                  />
-                  <div
-                    className="h-full bg-[#C93030]"
-                    style={{ width: `${sentimentLine.criticalPct}%` }}
-                  />
-                </div>
-                <span className="whitespace-nowrap text-[10px] text-[#8BA07A]">
-                  {sentimentLine.avg.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <UserChatView
+              messages={topicFilteredMessages}
+              messagesById={messagesById}
+              messageRefs={messageRefs}
+              selectedMessage={selectedMessage}
+              sheetOpen={sheetOpen}
+              onOpenMessage={openMessage}
+              onCloseSheet={closeSheet}
+              parentMessage={parentMessage}
+              timeGranularity={timeGranularity}
+              onJumpToParent={jumpToParentMessage}
+            />
+          )}
         </div>
 
-        {/* Message detail sheet */}
-        {selectedMessage && (
-          <div
-            className={`fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 rounded-t-[20px] border-t border-[#d4ddd0] bg-[#fafaf8] px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+20px)] shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-transform duration-300 ${
-              sheetOpen ? "translate-y-0" : "translate-y-full"
-            }`}
-          >
-            <div className="mb-3 flex justify-end">
-              <button
-                onClick={closeSheet}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e4ebe0] text-sm font-semibold text-[#4A5E42] hover:bg-[#d6e0d2]"
-                aria-label="Close detail panel"
-              >
-                ×
-              </button>
-            </div>
+        <UserMessageDetailSheet
+          selectedMessage={selectedMessage}
+          parentMessage={parentMessage}
+          sheetOpen={sheetOpen}
+          onCloseSheet={closeSheet}
+          initials={initials}
+          sentimentBadgeClass={sentimentBadgeClass}
+          getEffectiveParentId={getEffectiveParentId}
+          isAiOnlyReply={isAiOnlyReply}
+        />
 
-            <div className="mb-3 flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d6e0d2] text-xs font-semibold text-[#2B3A2B]">
-                {initials(selectedMessage.author)}
-              </div>
-
-              <div className="min-w-0">
-                <div className="truncate text-[15px] font-semibold text-[#2B3A2B]">
-                  {selectedMessage.author}
-                </div>
-                <div className="truncate text-[11px] text-[#8BA07A]">
-                  {selectedMessage.timestamp}
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-3 border-y border-[#d4ddd0] py-3 text-[13px] leading-[1.55] text-[#4A5E42]">
-              {selectedMessage.text}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {selectedMessage.topic && (
-                <span className="rounded-full bg-[#e4ebe0] px-2.5 py-1 text-[11px] font-medium text-[#4A5E42]">
-                  {selectedMessage.topic}
-                </span>
-              )}
-
-              <span
-                className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${sentimentBadgeClass(
-                  selectedMessage.sentiment
-                )}`}
-              >
-                {selectedMessage.sentiment ?? "neutral"}
-              </span>
-
-              {getEffectiveParentId(selectedMessage) && parentMessage && (
-                <span className="rounded-full bg-[#ddeedd] px-2.5 py-1 text-[11px] font-medium text-[#3D6B35]">
-                  replying to {parentMessage.author}
-                  {isAiOnlyReply(selectedMessage) ? " ★" : ""}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
+        <UserFooter
+          messageCount={topicFilteredMessages.length}
+          roots={roots}
+          depth={depth}
+          sentimentStats={sentimentLine}
+        />
       </div>
     </main>
   );

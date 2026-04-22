@@ -281,9 +281,13 @@ export default function UserThreadMapView({
         minZoom={0.6}
         maxZoom={1.5}
       >
+
+        
         <Background gap={20} size={1} color="#e4ebe0" />
         <Controls />
       </ReactFlow>
     </div>
+
+    
   );
 }
