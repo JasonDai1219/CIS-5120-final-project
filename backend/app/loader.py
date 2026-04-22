@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import List, Tuple
 
@@ -13,26 +14,14 @@ DATA_DIR = BASE_DIR / "data"
 
 
 def list_datasets() -> List[str]:
-    """Return all available dataset names without the .json extension."""
     if not DATA_DIR.exists():
         return []
-
     return sorted([p.stem for p in DATA_DIR.glob("*.json")])
 
 
-def load_messages(dataset_id: str) -> Tuple[List[Message], List[str]]:
-    """
-    Load and validate messages from a dataset file.
-
-    Rules:
-    - Invalid rows are skipped with warnings.
-    - Duplicate IDs are skipped after the first occurrence.
-    - Missing topic/sentiment fall back to defaults via schema.
-    - Messages are sorted by timestamp ascending.
-    """
+@lru_cache(maxsize=32)
+def _load_messages_cached(dataset_id: str, mtime: float) -> Tuple[List[Message], List[str]]:
     file_path = DATA_DIR / f"{dataset_id}.json"
-    if not file_path.exists():
-        raise FileNotFoundError(f"Dataset '{dataset_id}' not found.")
 
     with file_path.open("r", encoding="utf-8") as f:
         raw = json.load(f)
@@ -62,3 +51,12 @@ def load_messages(dataset_id: str) -> Tuple[List[Message], List[str]]:
 
     messages.sort(key=lambda m: m.timestamp)
     return messages, warnings
+
+
+def load_messages(dataset_id: str) -> Tuple[List[Message], List[str]]:
+    file_path = DATA_DIR / f"{dataset_id}.json"
+    if not file_path.exists():
+        raise FileNotFoundError(f"Dataset '{dataset_id}' not found.")
+
+    mtime = file_path.stat().st_mtime
+    return _load_messages_cached(dataset_id, mtime)

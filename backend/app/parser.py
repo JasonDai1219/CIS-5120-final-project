@@ -1,19 +1,41 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Dict, List, Tuple
 
 from app.schemas import Message, ThreadNode
 
 
-def build_thread_tree(messages: List[Message]) -> Tuple[List[ThreadNode], List[ThreadNode], dict]:
-    """
-    Build thread trees from flat messages.
+def _serialize_messages(messages: List[Message]) -> tuple:
+    return tuple(
+        (
+            m.id,
+            m.author,
+            m.timestamp.isoformat(),
+            m.text,
+            m.parentId,
+            m.topic,
+            m.sentiment,
+        )
+        for m in messages
+    )
 
-    Returns:
-    - roots: top-level discussion threads
-    - orphans: messages whose parentId does not exist
-    - stats: basic structure stats
-    """
+
+@lru_cache(maxsize=32)
+def _build_thread_tree_cached(serialized_messages: tuple) -> Tuple[List[ThreadNode], List[ThreadNode], dict]:
+    messages = [
+        Message(
+            id=m[0],
+            author=m[1],
+            timestamp=m[2],
+            text=m[3],
+            parentId=m[4],
+            topic=m[5],
+            sentiment=m[6],
+        )
+        for m in serialized_messages
+    ]
+
     node_map: Dict[str, ThreadNode] = {
         msg.id: ThreadNode(
             id=msg.id,
@@ -36,8 +58,7 @@ def build_thread_tree(messages: List[Message]) -> Tuple[List[ThreadNode], List[T
         if msg.parentId is None:
             roots.append(node)
         elif msg.parentId in node_map:
-            parent = node_map[msg.parentId]
-            parent.children.append(node)
+            node_map[msg.parentId].children.append(node)
         else:
             orphans.append(node)
 
@@ -51,8 +72,11 @@ def build_thread_tree(messages: List[Message]) -> Tuple[List[ThreadNode], List[T
     return roots, orphans, stats
 
 
+def build_thread_tree(messages: List[Message]) -> Tuple[List[ThreadNode], List[ThreadNode], dict]:
+    return _build_thread_tree_cached(_serialize_messages(messages))
+
+
 def _max_depth(roots: List[ThreadNode]) -> int:
-    """Compute the maximum depth across all roots."""
     if not roots:
         return 0
 

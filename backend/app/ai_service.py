@@ -5,36 +5,206 @@ import json
 import logging
 import os
 import re
+import sqlite3
+import threading
 import time
+from collections import defaultdict
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
+from openai import OpenAI
 
+from app.parser import build_thread_tree
 from app.schemas import Message, ThreadNode
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-_annotation_cache: Dict[str, dict] = {}
-_summary_cache: Dict[str, dict] = {}
+BASE_DIR = Path(__file__).resolve().parent.parent
+CACHE_DIR = BASE_DIR / ".cache"
+CACHE_DIR.mkdir(exist_ok=True)
+CACHE_DB = CACHE_DIR / "ai_cache.sqlite3"
+
+_client: OpenAI | None = None
 
 MAX_LIVE_AI_MESSAGES = 60
-ANNOTATION_CHUNK_SIZE = 8
+ANNOTATION_CHUNK_SIZE = 12
 ANNOTATION_RETRIES = 2
 OPENAI_TIMEOUT_SECONDS = 30
 
+_annotation_dataset_locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
+_summary_dataset_locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
 
-def _call_llm_json(prompt: str) -> Optional[dict]:
+
+def get_openai_client() -> OpenAI | None:
+    global _client
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        logger.debug("[AI] OPENAI_API_KEY not set, returning None")
+        logger.debug("[AI] OPENAI_API_KEY not set")
+        return None
+
+    if _client is None:
+        _client = OpenAI(api_key=api_key)
+
+    return _client
+
+
+def get_db() -> sqlite3.Connection:
+    conn = sqlite3.connect(CACHE_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_cache_db() -> None:
+    with get_db() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS annotation_cache (
+                cache_key TEXT PRIMARY KEY,
+                value_json TEXT NOT NULL,
+                created_at REAL NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS summary_cache (
+                cache_key TEXT PRIMARY KEY,
+                value_json TEXT NOT NULL,
+                created_at REAL NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS annotated_dataset_cache (
+                cache_key TEXT PRIMARY KEY,
+                value_json TEXT NOT NULL,
+                created_at REAL NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS summary_dataset_cache (
+                cache_key TEXT PRIMARY KEY,
+                value_json TEXT NOT NULL,
+                created_at REAL NOT NULL
+            )
+            """
+        )
+        conn.commit()
+
+
+def _get_cached_annotation(cache_key: str) -> Optional[dict]:
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT value_json FROM annotation_cache WHERE cache_key = ?",
+            (cache_key,),
+        ).fetchone()
+
+    if row is None:
         return None
 
     try:
-        import openai
+        return json.loads(row["value_json"])
+    except (json.JSONDecodeError, KeyError, TypeError):
+        logger.warning("[AI] Failed to decode cached annotation for key %s", cache_key)
+        return None
 
-        client = openai.OpenAI(api_key=api_key)
+
+def _set_cached_annotation(cache_key: str, value: dict) -> None:
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO annotation_cache (cache_key, value_json, created_at)
+            VALUES (?, ?, ?)
+            """,
+            (cache_key, json.dumps(value, ensure_ascii=False), time.time()),
+        )
+        conn.commit()
+
+
+def _get_cached_summary(cache_key: str) -> Optional[dict]:
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT value_json FROM summary_cache WHERE cache_key = ?",
+            (cache_key,),
+        ).fetchone()
+
+    if row is None:
+        return None
+
+    try:
+        return json.loads(row["value_json"])
+    except (json.JSONDecodeError, KeyError, TypeError):
+        logger.warning("[AI] Failed to decode cached summary for key %s", cache_key)
+        return None
+
+
+def _set_cached_summary(cache_key: str, value: dict) -> None:
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO summary_cache (cache_key, value_json, created_at)
+            VALUES (?, ?, ?)
+            """,
+            (cache_key, json.dumps(value, ensure_ascii=False), time.time()),
+        )
+        conn.commit()
+
+
+def _get_cached_dataset_payload(table_name: str, cache_key: str) -> Optional[dict]:
+    with get_db() as conn:
+        row = conn.execute(
+            f"SELECT value_json FROM {table_name} WHERE cache_key = ?",
+            (cache_key,),
+        ).fetchone()
+
+    if row is None:
+        return None
+
+    try:
+        return json.loads(row["value_json"])
+    except (json.JSONDecodeError, KeyError, TypeError):
+        logger.warning(
+            "[AI] Failed to decode cached dataset payload for key %s", cache_key
+        )
+        return None
+
+
+def _json_safe(value):
+    if isinstance(value, dict):
+        return {k: _json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return value
+
+
+def _set_cached_dataset_payload(table_name: str, cache_key: str, value: dict) -> None:
+    safe_value = _json_safe(value)
+    with get_db() as conn:
+        conn.execute(
+            f"""
+            INSERT OR REPLACE INTO {table_name} (cache_key, value_json, created_at)
+            VALUES (?, ?, ?)
+            """,
+            (cache_key, json.dumps(safe_value, ensure_ascii=False), time.time()),
+        )
+        conn.commit()
+
+
+def _call_llm_json(prompt: str) -> Optional[dict]:
+    client = get_openai_client()
+    if client is None:
+        return None
+
+    try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -53,7 +223,7 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
             return None
 
         raw_text = response.choices[0].message.content.strip()
-        logger.debug(f"[AI] Raw LLM response: {raw_text[:200]}...")
+        logger.debug("[AI] Raw LLM response: %s...", raw_text[:200])
 
         try:
             parsed = json.loads(raw_text)
@@ -80,11 +250,8 @@ def _call_llm_json(prompt: str) -> Optional[dict]:
             logger.warning("[AI] No JSON block found in response")
             return None
 
-    except ImportError:
-        logger.warning("[AI] openai package not installed, returning None")
-        return None
     except Exception as e:
-        logger.warning(f"[AI] LLM call failed: {type(e).__name__}: {e}")
+        logger.warning("[AI] LLM call failed: %s: %s", type(e).__name__, e)
         return None
 
 
@@ -100,6 +267,16 @@ def _build_message_cache_key(message: Message) -> str:
         f"{getattr(message, 'inferredReplyToId', None)}|"
         f"{message.text}"
     )
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def _build_dataset_cache_key(dataset_id: str, messages: List[Message]) -> str:
+    payload_parts = [dataset_id]
+    for msg in messages:
+        payload_parts.append(
+            f"{msg.id}|{msg.parentId}|{msg.timestamp.isoformat()}|{msg.text}"
+        )
+    payload = "||".join(payload_parts)
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -125,9 +302,10 @@ def _annotate_message_batch(messages: List[Message]) -> Dict[str, dict]:
             }
             continue
 
-        if cache_key in _annotation_cache:
-            results[msg.id] = _annotation_cache[cache_key]
-            logger.debug(f"[AI] Using cached annotation for message {msg.id}")
+        cached_annotation = _get_cached_annotation(cache_key)
+        if cached_annotation is not None:
+            results[msg.id] = cached_annotation
+            logger.debug("[AI] Using cached annotation for message %s", msg.id)
             continue
 
         uncached_messages.append(msg)
@@ -204,15 +382,17 @@ Return ONLY JSON in this format:
 
         sleep_seconds = 2 * (attempt + 1)
         logger.warning(
-            f"[AI] Batch annotation attempt {attempt + 1} failed for "
-            f"{len(uncached_messages)} messages, retrying in {sleep_seconds}s"
+            "[AI] Batch annotation attempt %s failed for %s messages, retrying in %ss",
+            attempt + 1,
+            len(uncached_messages),
+            sleep_seconds,
         )
         time.sleep(sleep_seconds)
 
     if parsed_items is None:
         logger.warning(
-            f"[AI] Batch annotation failed for {len(uncached_messages)} messages, "
-            "returning 'unknown' labels"
+            "[AI] Batch annotation failed for %s messages, returning 'unknown' labels",
+            len(uncached_messages),
         )
         for msg in uncached_messages:
             results[msg.id] = {
@@ -284,17 +464,20 @@ Return ONLY JSON in this format:
 
         if annotation["topic"] != "unknown" or annotation["sentiment"] != "unknown":
             cache_key = _build_message_cache_key(msg)
-            _annotation_cache[cache_key] = annotation
+            _set_cached_annotation(cache_key, annotation)
             logger.info(
-                f"[AI] Message {msg.id} annotated via batch API: "
-                f"topic={annotation['topic']}, sentiment={annotation['sentiment']}, "
-                f"inferred_reply_to_id={annotation['inferred_reply_to_id']}, "
-                f"reply_inferred={annotation['reply_inferred']}"
+                "[AI] Message %s annotated via batch API: topic=%s, sentiment=%s, "
+                "inferred_reply_to_id=%s, reply_inferred=%s",
+                msg.id,
+                annotation["topic"],
+                annotation["sentiment"],
+                annotation["inferred_reply_to_id"],
+                annotation["reply_inferred"],
             )
         else:
             logger.warning(
-                f"[AI] No valid batch annotation returned for message {msg.id}, "
-                "using 'unknown' labels"
+                "[AI] No valid batch annotation returned for message %s, using 'unknown' labels",
+                msg.id,
             )
 
     return results
@@ -344,9 +527,11 @@ def format_thread_transcript(messages: List[Message]) -> str:
 
 def summarize_thread(root: ThreadNode, all_messages: List[Message]) -> dict:
     cache_key = f"summary_{root.id}"
-    if cache_key in _summary_cache:
-        logger.debug(f"[AI] Using cached summary for root {root.id}")
-        return _summary_cache[cache_key]
+
+    cached_summary = _get_cached_summary(cache_key)
+    if cached_summary is not None:
+        logger.debug("[AI] Using cached summary for root %s", root.id)
+        return cached_summary
 
     thread_messages = flatten_thread(root)
     root_msg = next((m for m in all_messages if m.id == root.id), None)
@@ -372,11 +557,11 @@ Return ONLY JSON, no markdown or extra text."""
             if isinstance(result["key_points"], list)
             else [result["key_points"]],
         }
-        logger.info(f"[AI] Summary for root {root.id} generated via API")
-        _summary_cache[cache_key] = summary_dict
+        logger.info("[AI] Summary for root %s generated via API", root.id)
+        _set_cached_summary(cache_key, summary_dict)
         return summary_dict
 
-    logger.info(f"[AI] Using fallback summary for root {root.id}")
+    logger.info("[AI] Using fallback summary for root %s", root.id)
     return _summarize_fallback(root, thread_messages)
 
 
@@ -397,7 +582,7 @@ def _summarize_fallback(root: ThreadNode, thread_messages: List[Message]) -> dic
         "summary": summary,
         "key_points": key_points,
     }
-    logger.warning(f"[AI] Fallback summary used for root {root.id} (API unavailable)")
+    logger.warning("[AI] Fallback summary used for root %s (API unavailable)", root.id)
     return result
 
 
@@ -464,9 +649,10 @@ def _apply_root_topics(enriched: List[dict]) -> List[dict]:
 def enrich_messages_with_ai(messages: List[Message]) -> List[dict]:
     if len(messages) > MAX_LIVE_AI_MESSAGES:
         logger.warning(
-            f"[AI] Skipping live annotation for large dataset ({len(messages)} messages)"
+            "[AI] Skipping live annotation for large dataset (%s messages)",
+            len(messages),
         )
-        return [msg.model_dump() for msg in messages]
+        return [_json_safe(msg.model_dump()) for msg in messages]
 
     enriched: List[dict] = []
 
@@ -496,9 +682,77 @@ def enrich_messages_with_ai(messages: List[Message]) -> List[dict]:
             msg_dict["inferredReplyToId"] = annotation.get("inferred_reply_to_id")
             msg_dict["replyInferred"] = annotation.get("reply_inferred", False)
 
-        enriched.append(msg_dict)
+        enriched.append(_json_safe(msg_dict))
 
     enriched = _apply_root_topics(enriched)
 
-    logger.info(f"[AI] Enriched {len(enriched)} messages")
+    logger.info("[AI] Enriched %s messages", len(enriched))
     return enriched
+
+
+def get_cached_annotated_dataset(dataset_id: str, messages: List[Message]) -> dict:
+    cache_key = _build_dataset_cache_key(dataset_id, messages)
+
+    cached = _get_cached_dataset_payload("annotated_dataset_cache", cache_key)
+    if cached is not None:
+        logger.debug("[AI] Using cached annotated dataset for %s", dataset_id)
+        return cached
+
+    lock = _annotation_dataset_locks[cache_key]
+    with lock:
+        cached = _get_cached_dataset_payload("annotated_dataset_cache", cache_key)
+        if cached is not None:
+            logger.debug(
+                "[AI] Using cached annotated dataset for %s after lock", dataset_id
+            )
+            return cached
+
+        enriched_messages = enrich_messages_with_ai(messages)
+        result = {
+            "datasetId": dataset_id,
+            "messageCount": len(enriched_messages),
+            "messages": enriched_messages,
+            "warnings": [],
+        }
+
+        _set_cached_dataset_payload("annotated_dataset_cache", cache_key, result)
+        logger.info("[AI] Cached annotated dataset for %s", dataset_id)
+        return result
+
+
+def get_cached_summary_dataset(dataset_id: str, messages: List[Message]) -> dict:
+    cache_key = _build_dataset_cache_key(dataset_id, messages)
+
+    cached = _get_cached_dataset_payload("summary_dataset_cache", cache_key)
+    if cached is not None:
+        logger.debug("[AI] Using cached summary dataset for %s", dataset_id)
+        return cached
+
+    lock = _summary_dataset_locks[cache_key]
+    with lock:
+        cached = _get_cached_dataset_payload("summary_dataset_cache", cache_key)
+        if cached is not None:
+            logger.debug(
+                "[AI] Using cached summary dataset for %s after lock", dataset_id
+            )
+            return cached
+
+        enriched_dicts = get_cached_annotated_dataset(dataset_id, messages)["messages"]
+        enriched_messages = [Message(**msg_dict) for msg_dict in enriched_dicts]
+
+        roots, _orphans, _stats = build_thread_tree(enriched_messages)
+
+        summaries = []
+        for root in roots:
+            summaries.append(summarize_thread(root, enriched_messages))
+
+        result = {
+            "datasetId": dataset_id,
+            "summaryCount": len(summaries),
+            "summaries": _json_safe(summaries),
+            "warnings": [],
+        }
+
+        _set_cached_dataset_payload("summary_dataset_cache", cache_key, result)
+        logger.info("[AI] Cached summary dataset for %s", dataset_id)
+        return result

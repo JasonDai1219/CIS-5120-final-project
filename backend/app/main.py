@@ -1,26 +1,79 @@
 from __future__ import annotations
 
 import logging
+import threading
+from contextlib import asynccontextmanager
 from typing import Any, List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.ai_service import enrich_messages_with_ai, summarize_thread
+from app.ai_service import (
+    get_cached_annotated_dataset,
+    get_cached_summary_dataset,
+    init_cache_db,
+)
 from app.loader import list_datasets, load_messages
 from app.parser import build_thread_tree
 from app.schemas import DatasetListResponse, Message, MessagesResponse, ThreadResponse
 
 logger = logging.getLogger(__name__)
 
-# In-memory store for user-uploaded datasets
 uploaded_datasets: dict[str, list[Message]] = {}
+
+
+def _resolve_messages(dataset_id: str) -> tuple[list[Message], list[str]]:
+    if dataset_id in uploaded_datasets:
+        return uploaded_datasets[dataset_id], []
+    return load_messages(dataset_id)
+
+
+def _warm_all_datasets() -> None:
+    try:
+        dataset_ids = list_datasets()
+
+        datasets_with_sizes: list[tuple[str, int]] = []
+        for dataset_id in dataset_ids:
+            try:
+                messages, _warnings = load_messages(dataset_id)
+                datasets_with_sizes.append((dataset_id, len(messages)))
+            except Exception as e:
+                logger.warning("[Warmup] Failed loading %s: %s", dataset_id, e)
+
+        datasets_with_sizes.sort(key=lambda x: x[1])
+
+        for dataset_id, size in datasets_with_sizes:
+            try:
+                messages, _warnings = load_messages(dataset_id)
+                logger.info("[Warmup] Processing %s (%s messages)", dataset_id, size)
+
+                get_cached_annotated_dataset(dataset_id, messages)
+                get_cached_summary_dataset(dataset_id, messages)
+
+                logger.info("[Warmup] Finished %s", dataset_id)
+            except Exception as e:
+                logger.warning("[Warmup] Failed processing %s: %s", dataset_id, e)
+
+    except Exception as e:
+        logger.warning("[Warmup] Background warmup crashed: %s", e)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_cache_db()
+
+    warmup_thread = threading.Thread(target=_warm_all_datasets, daemon=True)
+    warmup_thread.start()
+
+    yield
+
 
 app = FastAPI(
     title="Discussion Thread Backend",
     version="0.1.0",
     description="Minimal backend for loading and parsing threaded discussion datasets.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -37,13 +90,6 @@ class UploadDatasetRequest(BaseModel):
     messages: List[Any]
 
 
-def _resolve_messages(dataset_id: str) -> tuple[list[Message], list[str]]:
-    """Load messages from file or in-memory uploaded store."""
-    if dataset_id in uploaded_datasets:
-        return uploaded_datasets[dataset_id], []
-    return load_messages(dataset_id)
-
-
 @app.get("/")
 def healthcheck() -> dict:
     return {"status": "ok", "service": "discussion-thread-backend"}
@@ -52,17 +98,17 @@ def healthcheck() -> dict:
 @app.get("/datasets", response_model=DatasetListResponse)
 def get_datasets() -> DatasetListResponse:
     file_datasets = list_datasets()
-    all_datasets = file_datasets + [k for k in uploaded_datasets if k not in file_datasets]
+    all_datasets = file_datasets + [
+        k for k in uploaded_datasets if k not in file_datasets
+    ]
     return DatasetListResponse(datasets=sorted(all_datasets))
 
 
 @app.post("/datasets/upload")
 def upload_dataset(payload: UploadDatasetRequest) -> dict:
-    """Accept a JSON array of messages and register it as an in-memory dataset."""
     from pydantic import ValidationError
 
     name = payload.name.strip() or "custom"
-    # Sanitize name: keep alphanumeric, hyphens, underscores
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in name)
 
     messages: list[Message] = []
@@ -75,14 +121,19 @@ def upload_dataset(payload: UploadDatasetRequest) -> dict:
         except ValidationError as e:
             warnings.append(f"Skipped row {idx}: {e.errors()[0]['msg']}")
             continue
+
         if msg.id in seen_ids:
             warnings.append(f"Skipped duplicate id '{msg.id}'.")
             continue
+
         seen_ids.add(msg.id)
         messages.append(msg)
 
     if not messages:
-        raise HTTPException(status_code=400, detail="No valid messages found in uploaded file.")
+        raise HTTPException(
+            status_code=400,
+            detail="No valid messages found in uploaded file.",
+        )
 
     messages.sort(key=lambda m: m.timestamp)
     uploaded_datasets[safe_name] = messages
@@ -133,12 +184,6 @@ def get_thread(dataset_id: str) -> ThreadResponse:
 
 @app.get("/discussions/{dataset_id}/messages/annotated")
 def get_annotated_messages(dataset_id: str) -> dict:
-    """
-    Return messages enriched with AI-generated topic and sentiment annotations.
-    
-    Skips messages that are already fully annotated (topic != 'unknown' AND sentiment != 'unknown').
-    Falls back to keyword-based heuristics if API key is missing or API fails.
-    """
     try:
         messages, warnings = _resolve_messages(dataset_id)
     except FileNotFoundError as e:
@@ -146,29 +191,13 @@ def get_annotated_messages(dataset_id: str) -> dict:
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-    enriched_messages = enrich_messages_with_ai(messages)
-
-    return {
-        "datasetId": dataset_id,
-        "messageCount": len(enriched_messages),
-        "messages": enriched_messages,
-        "warnings": warnings,
-    }
+    result = get_cached_annotated_dataset(dataset_id, messages)
+    result["warnings"] = warnings
+    return result
 
 
 @app.get("/discussions/{dataset_id}/ai-summary")
 def get_ai_summary(dataset_id: str) -> dict:
-    """
-    Return AI-generated summaries for each root thread in the dataset.
-    
-    Each summary includes:
-    - root_id: ID of the root message
-    - main_topic: Inferred topic from root message
-    - summary: 1-2 sentence summary of the thread
-    - key_points: List of 3 key discussion points
-    
-    Falls back to keyword-based heuristics if API key is missing or API fails.
-    """
     try:
         messages, warnings = _resolve_messages(dataset_id)
     except FileNotFoundError as e:
@@ -176,23 +205,6 @@ def get_ai_summary(dataset_id: str) -> dict:
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-    # First, enrich messages with AI annotations to get topics
-    enriched_dicts = enrich_messages_with_ai(messages)
-    
-    # Convert enriched dicts back to Message objects
-    enriched_messages = [Message(**msg_dict) for msg_dict in enriched_dicts]
-    
-    # Build thread tree from enriched messages
-    roots, _orphans, _stats = build_thread_tree(enriched_messages)
-
-    summaries = []
-    for root in roots:
-        summary = summarize_thread(root, enriched_messages)
-        summaries.append(summary)
-
-    return {
-        "datasetId": dataset_id,
-        "summaryCount": len(summaries),
-        "summaries": summaries,
-        "warnings": warnings,
-    }
+    result = get_cached_summary_dataset(dataset_id, messages)
+    result["warnings"] = warnings
+    return result
