@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion } from "motion/react";
 
 type TimeSliderProps = {
-  segments: number; // number of buckets
-  low: number;      // boundary index: 0..segments-1
-  high: number;     // boundary index: 1..segments
+  segments: number;
+  low: number;
+  high: number;
   onChange: (low: number, high: number) => void;
 };
 
@@ -22,7 +23,7 @@ export default function TimeSlider({
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef<"low" | "high" | null>(null);
 
-  const boundaryCount = segments + 1; // for 2 buckets => 3 boundaries
+  const boundaryCount = segments + 1;
 
   const toPercent = (boundaryIndex: number) => {
     if (boundaryCount <= 1) return 0;
@@ -70,22 +71,6 @@ export default function TimeSlider({
   const lowPct = toPercent(low);
   const highPct = toPercent(high);
 
-  const handleStyle = (pct: number, zIndex: number): React.CSSProperties => ({
-    position: "absolute",
-    left: `${pct}%`,
-    top: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 18,
-    height: 18,
-    borderRadius: "50%",
-    background: "#3D6B35",
-    border: "2px solid white",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-    cursor: "grab",
-    zIndex,
-    touchAction: "none",
-  });
-
   if (segments <= 0) return null;
 
   return (
@@ -100,7 +85,6 @@ export default function TimeSlider({
             alignItems: "center",
           }}
         >
-          {/* Base track */}
           <div
             style={{
               position: "absolute",
@@ -112,7 +96,6 @@ export default function TimeSlider({
             }}
           />
 
-          {/* Segment dividers */}
           {Array.from({ length: boundaryCount }).map((_, i) => {
             const pct = toPercent(i);
             return (
@@ -133,20 +116,26 @@ export default function TimeSlider({
             );
           })}
 
-          {/* Active selected range */}
-          <div
-            style={{
-              position: "absolute",
+          <motion.div
+            animate={{
               left: `${lowPct}%`,
               width: `${highPct - lowPct}%`,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 35,
+              mass: 0.4,
+            }}
+            style={{
+              position: "absolute",
               height: 6,
               borderRadius: 999,
               background: "#4CAF50",
             }}
           />
 
-          {/* Left handle */}
-          <div
+          <motion.div
             role="slider"
             aria-valuemin={0}
             aria-valuemax={segments - 1}
@@ -156,11 +145,31 @@ export default function TimeSlider({
               e.preventDefault();
               draggingRef.current = "low";
             }}
-            style={handleStyle(lowPct, 20)}
+            whileTap={{ scale: 1.08 }}
+            animate={{
+              left: `${lowPct - 1}%`,
+              scale: draggingRef.current === "low" ? 1.08 : 1,
+            }}
+            transition={{
+              left: { type: "spring", stiffness: 500, damping: 38, mass: 0.35 },
+              scale: { duration: 0.12 },
+            }}
+            style={{
+              position: "absolute",
+              top: "10%",
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              background: "#3D6B35",
+              border: "2px solid white",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+              cursor: "grab",
+              zIndex: 20,
+              touchAction: "none",
+            }}
           />
 
-          {/* Right handle */}
-          <div
+          <motion.div
             role="slider"
             aria-valuemin={1}
             aria-valuemax={segments}
@@ -170,7 +179,28 @@ export default function TimeSlider({
               e.preventDefault();
               draggingRef.current = "high";
             }}
-            style={handleStyle(highPct, 21)}
+            whileTap={{ scale: 1.08 }}
+            animate={{
+              left: `${highPct - 1}%`,
+              scale: draggingRef.current === "high" ? 1.08 : 1,
+            }}
+            transition={{
+              left: { type: "spring", stiffness: 500, damping: 38, mass: 0.35 },
+              scale: { duration: 0.12 },
+            }}
+            style={{
+              position: "absolute",
+              top: "10%",
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              background: "#3D6B35",
+              border: "2px solid white",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+              cursor: "grab",
+              zIndex: 20,
+              touchAction: "none",
+            }}
           />
         </div>
       </div>
