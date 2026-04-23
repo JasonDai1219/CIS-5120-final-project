@@ -13,8 +13,10 @@ import {
   type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { AnimatePresence, motion, useMotionValue, animate } from "motion/react";
+import { User } from "lucide-react";
 
-type Message = {
+export type Message = {
   id: string;
   author: string;
   timestamp: string;
@@ -26,108 +28,103 @@ type Message = {
   replyInferred?: boolean;
 };
 
-type Props = {
-  messages: Message[];
-  selectedMessageId: string | null;
-  onSelectMessage: (id: string) => void;
-};
-
-type TopicGroup = {
-  topic: string;
-  messages: Message[];
-  roots: Message[];
-  summary: string;
-  messageCount: number;
-};
-
-type TopicNodeData = {
-  kind: "topic";
-  topic: string;
-  summary: string;
-  messageCount: number;
-  isOpen: boolean;
-  onToggleTopic: (topic: string) => void;
-};
-
-type MessageGraphNodeData = {
-  kind: "message";
+export type BaseGraphNode = {
   id: string;
-  author: string;
-  text: string;
-  topic?: string;
+  parentId: string | null;
+  position: { x: number; y: number };
+  topicTitle: string;
+  aiSummary: string;
+  senderName: string;
+  messageText: string;
+  timestamp: string;
   sentiment?: string;
-  isSelected: boolean;
-  isTopicRoot: boolean;
-  topicName?: string;
-  summary?: string;
-  hiddenCount: number;
+  inferredReplyToId?: string | null;
+  replyInferred?: boolean;
+  isRoot: boolean;
   hasChildren: boolean;
-  isExpanded: boolean;
-  showInferredStar: boolean;
-  onToggleNode: (id: string) => void;
-  onSelectMessage: (id: string) => void;
-  onCollapseTopic?: (topic: string) => void;
 };
 
-type GraphNodeData = TopicNodeData | MessageGraphNodeData;
+type GraphCardData = {
+  id: string;
+  topicTitle: string;
+  aiSummary: string;
+  senderName: string;
+  messageText: string;
+  timestamp: string;
+  sentiment?: string;
+  isRoot: boolean;
+  hasChildren: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+  onOpenMessage: () => void;
+  onOpenTopic: () => void;
+};
 
-const TOPIC_NODE_W = 240;
-const TOPIC_NODE_H = 124;
+type GraphCardNodeType = Node<GraphCardData, "graphCard">;
 
-const MSG_NODE_W = 230;
-const MSG_NODE_H = 128;
+type NodeChevronButtonProps = {
+  expanded: boolean;
+  onToggle: () => void;
+};
 
-const CENTER_X = 420;
-const CENTER_Y = 260;
-const TOPIC_RADIUS = 240;
+type Props = {
+  nodesData: BaseGraphNode[];
+  edgesData: Edge[];
+  onOpenMessage: (msg: Message) => void;
+  onOpenTopic: (topic: BaseGraphNode) => void;
+};
 
-const ROOT_CHILD_Y_GAP = 170;
-const CHILD_Y_GAP = 160;
-const MIN_SIBLING_X_GAP = 260;
+function NodeChevronButton({ expanded, onToggle }: NodeChevronButtonProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const midY = useMotionValue(expanded ? 6 : 18);
 
-function getEffectiveParentId(msg: Message) {
-  return msg.inferredReplyToId ?? msg.parentId ?? null;
-}
-
-function isAiOnlyInferredReply(msg: Message) {
-  return !msg.parentId && !!msg.inferredReplyToId && !!msg.replyInferred;
-}
-
-function previewText(text: string, max = 120) {
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
-}
-
-function summarizeTopic(messages: Message[]) {
-  const text = messages
-    .map((m) => m.text.trim())
-    .filter(Boolean)
-    .slice(0, 3)
-    .join(" ");
-  return previewText(text || "Open to explore this topic.", 120);
-}
-
-function summarizeChildren(children: Message[]) {
-  const text = children
-    .map((m) => m.text.trim())
-    .filter(Boolean)
-    .slice(0, 2)
-    .join(" ");
-  return previewText(text || "Open to see replies.", 70);
-}
-
-function sortByTimestamp(messages: Message[]) {
-  return [...messages].sort(
-    (a, b) =>
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  );
-}
-
-function hashOffset(seed: string, range: number) {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  async function animateTo(value: number) {
+    await animate(midY, value, {
+      duration: 0.1,
+      ease: "easeInOut",
+    }).finished;
   }
-  return (Math.abs(hash) % (range * 2 + 1)) - range;
+
+  async function handleClick() {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    await animateTo(expanded ? 18 : 6);
+    onToggle();
+    setIsAnimating(false);
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      type="button"
+      aria-label="Toggle node chevron"
+      className="nodrag flex h-11 w-11 items-center justify-center rounded-full bg-transparent transition active:scale-95"
+    >
+      <svg width="28" height="24" viewBox="0 0 28 24" className="overflow-visible">
+        <motion.line
+          x1="4"
+          y1="12"
+          x2="14"
+          y2={midY}
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <motion.line
+          x1="14"
+          y1={midY}
+          x2="24"
+          y2="12"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <circle cx="4" cy="12" r="1.1" fill="currentColor" />
+        <motion.circle cx="14" cy={midY} r="1.1" fill="currentColor" />
+        <circle cx="24" cy="12" r="1.1" fill="currentColor" />
+      </svg>
+    </button>
+  );
 }
 
 function sentimentBadgeClass(sentiment?: string) {
@@ -143,550 +140,157 @@ function sentimentBadgeClass(sentiment?: string) {
   }
 }
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((p) => p[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function splitSummary(summary?: string, maxLen = 26) {
-  if (!summary) return ["", ""];
-
-  if (summary.length <= maxLen) return [summary, ""];
-
-  const words = summary.split(" ");
-  let line1 = "";
-  let line2 = "";
-
-  for (const word of words) {
-    const next = `${line1} ${word}`.trim();
-    if (next.length <= maxLen) {
-      line1 = next;
-    } else {
-      const next2 = `${line2} ${word}`.trim();
-      line2 = next2.length <= maxLen ? next2 : `${line2}…`;
-    }
-  }
-
-  if (line2.length > maxLen) {
-    line2 = `${line2.slice(0, maxLen - 1)}…`;
-  }
-
-  return [line1, line2];
-}
-
-function buildTopicGroups(messages: Message[]): TopicGroup[] {
-  const byTopic = new Map<string, Message[]>();
-
-  for (const msg of messages) {
-    const topic = msg.topic && msg.topic !== "unknown" ? msg.topic : "other";
-    if (!byTopic.has(topic)) byTopic.set(topic, []);
-    byTopic.get(topic)!.push(msg);
-  }
-
-  const groups: TopicGroup[] = [];
-
-  for (const [topic, raw] of byTopic) {
-    const topicMessages = sortByTimestamp(raw);
-    const ids = new Set(topicMessages.map((m) => m.id));
-
-    const roots = topicMessages.filter((msg) => {
-      const parentId = getEffectiveParentId(msg);
-      return !parentId || !ids.has(parentId);
-    });
-
-    groups.push({
-      topic,
-      messages: topicMessages,
-      roots: sortByTimestamp(roots),
-      summary: summarizeTopic(topicMessages),
-      messageCount: topicMessages.length,
-    });
-  }
-
-  return groups.sort((a, b) => a.topic.localeCompare(b.topic));
-}
-
-function buildChildrenMap(messages: Message[]) {
-  const ids = new Set(messages.map((m) => m.id));
-  const map = new Map<string | null, Message[]>();
-
-  for (const msg of messages) {
-    const parentId = getEffectiveParentId(msg);
-    const effectiveParent = parentId && ids.has(parentId) ? parentId : null;
-    if (!map.has(effectiveParent)) map.set(effectiveParent, []);
-    map.get(effectiveParent)!.push(msg);
-  }
-
-  for (const [key, arr] of map) {
-    map.set(key, sortByTimestamp(arr));
-  }
-
-  return map;
-}
-
-function descendantCount(
-  nodeId: string,
-  childrenMap: Map<string | null, Message[]>
-): number {
-  const children = childrenMap.get(nodeId) ?? [];
-  let total = children.length;
-  for (const child of children) {
-    total += descendantCount(child.id, childrenMap);
-  }
-  return total;
-}
-
-function TopicNode({ data }: NodeProps) {
-  const typed = data as TopicNodeData;
+function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
+  const cardMode = data.isRoot && !data.expanded ? "topic" : "node";
+  const showButton = cardMode === "topic" || (cardMode === "node" && data.hasChildren);
 
   return (
-    <div
-      className="rounded-[18px] border border-[#d4ddd0] bg-[#fafaf8] px-4 py-4 shadow-sm"
-      style={{
-        width: TOPIC_NODE_W,
-        height: TOPIC_NODE_H,
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="relative">
       <Handle
         type="target"
         position={Position.Top}
-        style={{ opacity: 0, width: 1, height: 1, border: 0 }}
+        className="!h-2 !w-2 !border-0 !bg-[#8BA07A]"
       />
 
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="truncate text-[14px] font-semibold text-[#2B3A2B]">
-          {typed.topic}
-        </div>
-        <span className="shrink-0 rounded-full bg-[#e4ebe0] px-2 py-0.5 text-[10px] font-medium text-[#4A5E42]">
-          {typed.messageCount} msgs
-        </span>
-      </div>
-
-      <div className="mb-3 text-[11px] leading-[1.35] text-[#4A5E42]">
-        {typed.summary}
-      </div>
-
-      <div className="flex justify-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        style={{ width: 320, height: 180, boxSizing: "border-box" }}
+        className="flex flex-col rounded-[16px] border border-[#d4ddd0] bg-white px-4 pt-4 shadow-md"
+      >
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            typed.onToggleTopic(typed.topic);
-          }}
-          className="text-[18px] font-medium text-[#4A5E42]"
+          onClick={() => (cardMode === "topic" ? data.onOpenTopic() : data.onOpenMessage())}
+          style={{ height: 120, minHeight: 120, maxHeight: 120 }}
+          className="block w-full overflow-hidden text-left"
         >
-          {typed.isOpen ? "⌃" : "⌄"}
-        </button>
-      </div>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        style={{ opacity: 0, width: 1, height: 1, border: 0 }}
-      />
-    </div>
-  );
-}
-
-function MessageNode({ data }: NodeProps) {
-  const typed = data as MessageGraphNodeData;
-  const [line1, line2] = splitSummary(typed.summary);
-
-  if (typed.isTopicRoot) {
-    return (
-      <div
-        className={`rounded-[18px] border px-4 py-4 shadow-sm ${
-          typed.isSelected
-            ? "border-[#3D6B35] bg-[#f3f7ef]"
-            : "border-[#d4ddd0] bg-[#fafaf8]"
-        }`}
-        style={{
-          width: TOPIC_NODE_W,
-          height: TOPIC_NODE_H,
-          boxSizing: "border-box",
-        }}
-      >
-        <Handle
-          type="target"
-          position={Position.Top}
-          style={{ opacity: 0, width: 1, height: 1, border: 0 }}
-        />
-
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <div className="truncate text-[14px] font-semibold text-[#2B3A2B]">
-            {typed.topicName}
-          </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              typed.onCollapseTopic?.(typed.topicName || "");
-            }}
-            className="text-[18px] font-medium text-[#4A5E42]"
-          >
-            ⌃
-          </button>
-        </div>
-
-        <div className="mb-2 text-[11px] leading-[1.35] text-[#4A5E42]">
-          {typed.summary}
-        </div>
-
-        <div className="text-center text-[10px] text-[#8BA07A]">
-          Expand branches below
-        </div>
-
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          style={{ opacity: 0, width: 1, height: 1, border: 0 }}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`flex flex-col justify-between rounded-[16px] border px-3 py-3 shadow-sm transition ${
-        typed.isSelected
-          ? "border-[#3D6B35] bg-[#f3f7ef]"
-          : "border-[#d4ddd0] bg-white"
-      }`}
-      style={{
-        width: MSG_NODE_W,
-        height: MSG_NODE_H,
-        boxSizing: "border-box",
-      }}
-      onClick={() => typed.onSelectMessage(typed.id)}
-    >
-      <Handle
-        type="target"
-        position={Position.Top}
-        style={{ opacity: 0, width: 1, height: 1, border: 0 }}
-      />
-
-      <div>
-        <div className="mb-2 flex items-start gap-2">
-          <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#d6e0d2] text-[9px] font-semibold text-[#2B3A2B]">
-            {initials(typed.author)}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[11px] font-semibold text-[#2B3A2B]">
-              {typed.author}
-              {typed.showInferredStar ? " ★" : ""}
-            </div>
-            <div className="mt-0.5 break-words text-[10px] leading-[1.35] text-[#2B3A2B]">
-              {previewText(typed.text, typed.isExpanded ? 120 : 92)}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span
-            className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium ${sentimentBadgeClass(
-              typed.sentiment
-            )}`}
-          >
-            {typed.sentiment ?? "neutral"}
-          </span>
-
-          {typed.topic && (
-            <span className="rounded-full bg-[#e4ebe0] px-1.5 py-0.5 text-[9px] font-medium text-[#4A5E42]">
-              {typed.topic}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {typed.hasChildren ? (
-        <div className="mt-2 flex w-full flex-col items-center text-center">
-          {!typed.isExpanded ? (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  typed.onToggleNode(typed.id);
-                }}
-                className="flex w-full flex-col items-center"
+          <AnimatePresence mode="wait" initial={false}>
+            {cardMode === "topic" ? (
+              <motion.div
+                key="topic"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.1, ease: "easeOut" }}
+                className="flex h-full w-full flex-col overflow-hidden"
               >
-                <div className="text-[9px] leading-[1.2] text-[#8BA07A]">
-                  {line1}
+                <div
+                  className="shrink-0 text-center text-base font-bold text-[#2B3A2B]"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {data.topicTitle}
                 </div>
-                {line2 ? (
-                  <div className="text-[9px] leading-[1.2] text-[#8BA07A]">
-                    {line2}
+                <div
+                  className="mt-3 text-sm leading-6 text-[#4D5B4D]"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 4,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {data.aiSummary}
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="node"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.1, ease: "easeOut" }}
+                className="flex h-full w-full flex-col overflow-hidden"
+              >
+                <div className="flex items-start justify-between gap-3 text-[#2B3A2B]">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e4ebe0]">
+                      <User size={16} />
+                    </div>
+                    <span
+                      className="min-w-0 text-sm font-medium"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {data.senderName}
+                    </span>
                   </div>
-                ) : (
-                  <div className="h-[11px]" />
-                )}
-                <div className="mt-1 text-[18px] font-medium leading-none text-[#4A5E42]">
-                  ⌄
+
+                  <span className="shrink-0 text-[10px] text-[#8BA07A]">
+                    {new Date(data.timestamp).toLocaleString([], {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                typed.onToggleNode(typed.id);
-              }}
-              className="text-[18px] font-medium leading-none text-[#4A5E42]"
-            >
-              ⌃
-            </button>
-          )}
+
+                <div
+                  className="mt-3 text-sm leading-6 text-[#4D5B4D]"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {data.messageText}
+                </div>
+
+                <div className="mt-auto flex justify-end pt-2">
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium ${sentimentBadgeClass(
+                      data.sentiment
+                    )}`}
+                  >
+                    {data.sentiment ?? "neutral"}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </button>
+
+        <div
+          style={{ height: 36, minHeight: 36, maxHeight: 36 }}
+          className="flex w-full items-center justify-center"
+        >
+          {showButton ? (
+            <NodeChevronButton expanded={data.expanded} onToggle={data.onToggle} />
+          ) : null}
         </div>
-      ) : (
-        <div />
-      )}
+      </motion.div>
 
       <Handle
         type="source"
         position={Position.Bottom}
-        style={{ opacity: 0, width: 1, height: 1, border: 0 }}
+        className="!h-2 !w-2 !border-0 !bg-[#8BA07A]"
       />
     </div>
   );
-}
-
-const nodeTypes: NodeTypes = {
-  topicNode: TopicNode,
-  messageNode: MessageNode,
-};
-
-function buildVisibleGraph(
-  topicGroups: TopicGroup[],
-  openTopic: string | null,
-  expandedNodeIds: Set<string>,
-  selectedMessageId: string | null,
-  onToggleTopic: (topic: string) => void,
-  onToggleNode: (id: string) => void,
-  onSelectMessage: (id: string) => void
-): { nodes: Node<GraphNodeData>[]; edges: Edge[] } {
-  const nodes: Node<GraphNodeData>[] = [];
-  const edges: Edge[] = [];
-
-  const count = Math.max(topicGroups.length, 1);
-
-  topicGroups.forEach((group, index) => {
-    const angle = (2 * Math.PI * index) / count - Math.PI / 2;
-    const topicX =
-      CENTER_X +
-      TOPIC_RADIUS * Math.cos(angle) +
-      hashOffset(group.topic + ":x", 18);
-    const topicY =
-      CENTER_Y +
-      TOPIC_RADIUS * Math.sin(angle) +
-      hashOffset(group.topic + ":y", 18);
-
-    if (openTopic !== group.topic) {
-      nodes.push({
-        id: `topic:${group.topic}`,
-        type: "topicNode",
-        position: { x: topicX, y: topicY },
-        draggable: false,
-        data: {
-          kind: "topic",
-          topic: group.topic,
-          summary: group.summary,
-          messageCount: group.messageCount,
-          isOpen: false,
-          onToggleTopic,
-        },
-      });
-      return;
-    }
-
-    const childrenMap = buildChildrenMap(group.messages);
-    const topicRootId = `topic-root:${group.topic}`;
-
-    nodes.push({
-      id: topicRootId,
-      type: "messageNode",
-      position: { x: topicX, y: topicY },
-      draggable: false,
-      data: {
-        kind: "message",
-        id: topicRootId,
-        author: group.topic,
-        text: group.summary,
-        topic: group.topic,
-        sentiment: undefined,
-        isSelected: false,
-        isTopicRoot: true,
-        topicName: group.topic,
-        summary: group.summary,
-        hiddenCount: 0,
-        hasChildren: true,
-        isExpanded: true,
-        showInferredStar: false,
-        onToggleNode,
-        onSelectMessage,
-        onCollapseTopic: onToggleTopic,
-      },
-    });
-
-    const visibleRoots = group.roots;
-    const rootFanWidth = Math.max(
-      MIN_SIBLING_X_GAP,
-      (visibleRoots.length - 1) * MIN_SIBLING_X_GAP
-    );
-
-    visibleRoots.forEach((rootMsg, i) => {
-      const rootX =
-        topicX -
-        rootFanWidth / 2 +
-        i * MIN_SIBLING_X_GAP +
-        hashOffset(rootMsg.id + ":x", 16);
-      const rootY =
-        topicY + ROOT_CHILD_Y_GAP + hashOffset(rootMsg.id + ":y", 8);
-
-      edges.push({
-        id: `${topicRootId}-${rootMsg.id}`,
-        source: topicRootId,
-        target: rootMsg.id,
-        type: "smoothstep",
-        style: { stroke: "#7a8e73", strokeWidth: 1.6 },
-      });
-
-      placeMessageSubtree(
-        rootMsg,
-        rootX,
-        rootY,
-        childrenMap,
-        expandedNodeIds,
-        selectedMessageId,
-        onToggleNode,
-        onSelectMessage,
-        nodes,
-        edges
-      );
-    });
-  });
-
-  return { nodes, edges };
-}
-
-function placeMessageSubtree(
-  msg: Message,
-  x: number,
-  y: number,
-  childrenMap: Map<string | null, Message[]>,
-  expandedNodeIds: Set<string>,
-  selectedMessageId: string | null,
-  onToggleNode: (id: string) => void,
-  onSelectMessage: (id: string) => void,
-  nodes: Node<GraphNodeData>[],
-  edges: Edge[]
-) {
-  const children = childrenMap.get(msg.id) ?? [];
-  const hasChildren = children.length > 0;
-  const isExpanded = expandedNodeIds.has(msg.id);
-  const hiddenCount = hasChildren ? descendantCount(msg.id, childrenMap) : 0;
-
-  nodes.push({
-    id: msg.id,
-    type: "messageNode",
-    position: { x, y },
-    draggable: false,
-    data: {
-      kind: "message",
-      id: msg.id,
-      author: msg.author,
-      text: msg.text,
-      topic: msg.topic,
-      sentiment: msg.sentiment,
-      isSelected: selectedMessageId === msg.id,
-      isTopicRoot: false,
-      hiddenCount,
-      hasChildren,
-      isExpanded,
-      showInferredStar: isAiOnlyInferredReply(msg),
-      summary: hasChildren ? summarizeChildren(children) : undefined,
-      onToggleNode,
-      onSelectMessage,
-    },
-  });
-
-  if (!hasChildren || !isExpanded) return;
-
-  const fanWidth = Math.max(
-    MIN_SIBLING_X_GAP,
-    (children.length - 1) * MIN_SIBLING_X_GAP
-  );
-
-  children.forEach((child, index) => {
-    const childX =
-      x -
-      fanWidth / 2 +
-      index * MIN_SIBLING_X_GAP +
-      hashOffset(child.id + ":x", 16);
-    const childY = y + CHILD_Y_GAP + hashOffset(child.id + ":y", 10);
-
-    const aiOnly = isAiOnlyInferredReply(child);
-    const stroke = aiOnly ? "#A8B89A" : "#7a8e73";
-
-    edges.push({
-      id: `${msg.id}-${child.id}`,
-      source: msg.id,
-      target: child.id,
-      type: "smoothstep",
-      animated: aiOnly,
-      style: aiOnly
-        ? {
-            stroke,
-            strokeWidth: 1.4,
-            strokeDasharray: "4 3",
-            strokeLinecap: "round",
-          }
-        : {
-            stroke,
-            strokeWidth: 1.6,
-            strokeLinecap: "round",
-          },
-    });
-
-    placeMessageSubtree(
-      child,
-      childX,
-      childY,
-      childrenMap,
-      expandedNodeIds,
-      selectedMessageId,
-      onToggleNode,
-      onSelectMessage,
-      nodes,
-      edges
-    );
-  });
 }
 
 export default function UserThreadMapView({
-  messages,
-  selectedMessageId,
-  onSelectMessage,
+  nodesData,
+  edgesData,
+  onOpenMessage,
+  onOpenTopic,
 }: Props) {
-  const topicGroups = useMemo(() => buildTopicGroups(messages), [messages]);
-
-  const [openTopic, setOpenTopic] = useState<string | null>(null);
-  const [expandedNodeIds, setExpandedNodeIds] = useState<Set<string>>(
-    new Set()
-  );
-
-  const toggleTopic = (topic: string) => {
-    setOpenTopic((prev) => (prev === topic ? null : topic));
-  };
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleNode = (id: string) => {
-    setExpandedNodeIds((prev) => {
+    setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -694,35 +298,90 @@ export default function UserThreadMapView({
     });
   };
 
-  const graph = useMemo(
+  const nodeById = useMemo(() => {
+    const map = new Map<string, BaseGraphNode>();
+    for (const node of nodesData) map.set(node.id, node);
+    return map;
+  }, [nodesData]);
+
+  const visibleBaseNodes = useMemo(() => {
+    function isVisible(node: BaseGraphNode): boolean {
+      if (node.parentId === null) return true;
+      const parent = nodeById.get(node.parentId);
+      if (!parent) return false;
+      return isVisible(parent) && expandedIds.has(parent.id);
+    }
+
+    return nodesData.filter(isVisible);
+  }, [expandedIds, nodeById, nodesData]);
+
+  const visibleNodeIds = useMemo(
+    () => new Set(visibleBaseNodes.map((node) => node.id)),
+    [visibleBaseNodes]
+  );
+
+  const nodes = useMemo<GraphCardNodeType[]>(
     () =>
-      buildVisibleGraph(
-        topicGroups,
-        openTopic,
-        expandedNodeIds,
-        selectedMessageId,
-        toggleTopic,
-        toggleNode,
-        onSelectMessage
+      visibleBaseNodes.map((node) => ({
+        id: node.id,
+        type: "graphCard",
+        position: node.position,
+        data: {
+          id: node.id,
+          topicTitle: node.topicTitle,
+          aiSummary: node.aiSummary,
+          senderName: node.senderName,
+          messageText: node.messageText,
+          timestamp: node.timestamp,
+          sentiment: node.sentiment,
+          isRoot: node.isRoot,
+          hasChildren: node.hasChildren,
+          expanded: expandedIds.has(node.id),
+          onToggle: () => toggleNode(node.id),
+          onOpenMessage: () =>
+            onOpenMessage({
+              id: node.id,
+              author: node.senderName,
+              timestamp: node.timestamp,
+              text: node.messageText,
+              parentId: node.parentId,
+              topic: node.topicTitle,
+              sentiment: node.sentiment,
+              inferredReplyToId: node.inferredReplyToId,
+              replyInferred: node.replyInferred,
+            }),
+          onOpenTopic: () => onOpenTopic(node),
+        },
+      })),
+    [visibleBaseNodes, expandedIds, onOpenMessage, onOpenTopic]
+  );
+
+  const edges = useMemo(
+    () =>
+      edgesData.filter(
+        (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
       ),
-    [topicGroups, openTopic, expandedNodeIds, selectedMessageId, onSelectMessage]
+    [edgesData, visibleNodeIds]
+  );
+
+  const nodeTypes = useMemo<NodeTypes>(
+    () => ({
+      graphCard: GraphCardNode,
+    }),
+    []
   );
 
   return (
-    <div className="h-full w-full overflow-hidden rounded-xl bg-transparent">
+    <div className="h-full w-full overflow-hidden">
       <ReactFlow
-        nodes={graph.nodes}
-        edges={graph.edges}
+        nodes={nodes}
+        edges={edges}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.18 }}
-        minZoom={0.35}
-        maxZoom={1.5}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable
+        proOptions={{ hideAttribution: true }}
+        className="h-full w-full bg-transparent"
       >
-        <Background gap={20} size={1} color="#e4ebe0" />
+        <Background gap={18} size={1} />
         <Controls />
       </ReactFlow>
     </div>
