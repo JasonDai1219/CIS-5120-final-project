@@ -40,7 +40,7 @@ type MessageNodeData = {
   isSelected: boolean;
 };
 
-const NODE_WIDTH = 260;
+const NODE_WIDTH = 300;
 const NODE_HEIGHT = 130;
 
 function sentimentClasses(sentiment?: string) {
@@ -61,7 +61,7 @@ function MessageNode({ data }: NodeProps) {
   const styles = sentimentNodeStyles(typed.sentiment, typed.isSelected);
 
   return (
-    <div className="w-[260px] rounded-xl p-3 shadow-sm transition" style={styles}>
+    <div className="rounded-xl p-3 shadow-sm transition overflow-hidden" style={{ width: NODE_WIDTH, ...styles }}>
       <Handle type="target" position={Position.Top} />
 
       <div className="mb-2 flex items-start justify-between gap-2">

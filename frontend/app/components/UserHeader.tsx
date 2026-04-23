@@ -78,7 +78,7 @@ export default function UserHeader({
     };
 
     return (
-        <div className="shrink-0 border-b border-[#d4ddd0] px-5 pt-4 pb-3">
+        <div className="shrink-0 border-b border-[#d4ddd0] px-4 p-4">
             <div className="flex flex-col gap-3">
 
                 {/* Row 1: title + dataset picker */}

@@ -19,7 +19,7 @@ export default function UserFooter({
   sentimentStats,
 }: Props) {
   return (
-    <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 border-t border-[#d4ddd0] bg-[#fafaf8] px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+    <div className="absolute bottom-0 left-1/2 z-40 w-full -translate-x-1/2 border-t border-[#d4ddd0] bg-[#fafaf8] p-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
       <div className="mb-3 flex gap-2">
         {[
           { value: messageCount, label: "messages" },

@@ -35,7 +35,9 @@ export default function UserMessageDetailSheet({
 
   return (
     <div
-      className={`fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 rounded-t-[20px] border-t border-[#d4ddd0] bg-[#fafaf8] px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+20px)] shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-transform duration-300 ${
+      className={`fixed bottom-0 w-full -translate-x-1/2 
+        rounded-t-[20px] border-t border-[#d4ddd0] bg-[#fafaf8] px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+20px)] 
+        shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-transform duration-100 ${
         sheetOpen ? "translate-y-0" : "translate-y-full"
       }`}
     >

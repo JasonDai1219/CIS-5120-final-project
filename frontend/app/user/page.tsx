@@ -470,7 +470,7 @@ export default function UserAppPage() {
           onChangeViewMode={setViewMode}
         />
 
-        <div className="min-h-0 flex-1 overflow-hidden pb-36">
+        <div className="min-h-0 flex-1 overflow-hidden">
           {error ? (
             <div className="p-4 text-sm text-red-700">{error}</div>
           ) : viewMode === "map" ? (
