@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Background,
   Controls,
@@ -14,6 +14,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { AnimatePresence, motion, useMotionValue, animate } from "motion/react";
+import { layoutThreadMap } from "../lib/layoutThreadMap";
 import { User } from "lucide-react";
 
 export type Message = {
@@ -142,7 +143,17 @@ function sentimentBadgeClass(sentiment?: string) {
 
 function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
   const cardMode = data.isRoot && !data.expanded ? "topic" : "node";
-  const showButton = cardMode === "topic" || (cardMode === "node" && data.hasChildren);
+  const showButton =
+    cardMode === "topic" || (cardMode === "node" && data.hasChildren);
+
+  const nodeCardBgClass =
+    data.sentiment === "critical"
+      ? "bg-red-50"
+      : data.sentiment === "supportive"
+        ? "bg-green-100"
+        : data.sentiment === "mixed"
+          ? "bg-yellow-50"
+          : "bg-white";
 
   return (
     <div className="relative">
@@ -157,11 +168,15 @@ function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
         style={{ width: 320, height: 180, boxSizing: "border-box" }}
-        className="flex flex-col rounded-[16px] border border-[#d4ddd0] bg-white px-4 pt-4 shadow-md"
+        className={`flex flex-col rounded-[16px] border border-[#d4ddd0] px-4 pt-4 shadow-md ${
+          cardMode === "node" ? nodeCardBgClass : "bg-white"
+        }`}
       >
         <button
           type="button"
-          onClick={() => (cardMode === "topic" ? data.onOpenTopic() : data.onOpenMessage())}
+          onClick={() =>
+            cardMode === "topic" ? data.onOpenTopic() : data.onOpenMessage()
+          }
           style={{ height: 120, minHeight: 120, maxHeight: 120 }}
           className="block w-full overflow-hidden text-left"
         >
@@ -254,7 +269,7 @@ function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
                       data.sentiment
                     )}`}
                   >
-                    {data.sentiment ?? "neutral"}
+                    {data.sentiment ?? "unknown"}
                   </span>
                 </div>
               </motion.div>
@@ -267,7 +282,10 @@ function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
           className="flex w-full items-center justify-center"
         >
           {showButton ? (
-            <NodeChevronButton expanded={data.expanded} onToggle={data.onToggle} />
+            <NodeChevronButton
+              expanded={data.expanded}
+              onToggle={data.onToggle}
+            />
           ) : null}
         </div>
       </motion.div>
@@ -288,6 +306,9 @@ export default function UserThreadMapView({
   onOpenTopic,
 }: Props) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [layoutedVisibleNodes, setLayoutedVisibleNodes] = useState<BaseGraphNode[]>([]);
+  const [anchorNodeId, setAnchorNodeId] = useState<string | null>(null);
+  
 
   const toggleNode = (id: string) => {
     setExpandedIds((prev) => {
@@ -300,7 +321,9 @@ export default function UserThreadMapView({
 
   const nodeById = useMemo(() => {
     const map = new Map<string, BaseGraphNode>();
-    for (const node of nodesData) map.set(node.id, node);
+    for (const node of nodesData) {
+      map.set(node.id, node);
+    }
     return map;
   }, [nodesData]);
 
@@ -312,7 +335,19 @@ export default function UserThreadMapView({
       return isVisible(parent) && expandedIds.has(parent.id);
     }
 
-    return nodesData.filter(isVisible);
+    return nodesData
+      .filter(isVisible)
+      .slice()
+      .sort((a, b) => {
+        if (a.parentId !== b.parentId) {
+          if (a.parentId === null && b.parentId !== null) return -1;
+          if (a.parentId !== null && b.parentId === null) return 1;
+        }
+
+        return (
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+      });
   }, [expandedIds, nodeById, nodesData]);
 
   const visibleNodeIds = useMemo(
@@ -320,9 +355,34 @@ export default function UserThreadMapView({
     [visibleBaseNodes]
   );
 
+  const visibleEdges = useMemo(
+    () =>
+      edgesData.filter(
+        (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
+      ),
+    [edgesData, visibleNodeIds]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function runLayout() {
+      const result = await layoutThreadMap(visibleBaseNodes, visibleEdges);
+      if (!cancelled) {
+        setLayoutedVisibleNodes(result);
+      }
+    }
+
+    runLayout();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleBaseNodes, visibleEdges]);
+
   const nodes = useMemo<GraphCardNodeType[]>(
     () =>
-      visibleBaseNodes.map((node) => ({
+      layoutedVisibleNodes.map((node) => ({
         id: node.id,
         type: "graphCard",
         position: node.position,
@@ -353,16 +413,10 @@ export default function UserThreadMapView({
           onOpenTopic: () => onOpenTopic(node),
         },
       })),
-    [visibleBaseNodes, expandedIds, onOpenMessage, onOpenTopic]
+    [layoutedVisibleNodes, expandedIds, onOpenMessage, onOpenTopic]
   );
 
-  const edges = useMemo(
-    () =>
-      edgesData.filter(
-        (edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
-      ),
-    [edgesData, visibleNodeIds]
-  );
+  const edges = visibleEdges;
 
   const nodeTypes = useMemo<NodeTypes>(
     () => ({
@@ -378,6 +432,7 @@ export default function UserThreadMapView({
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
         proOptions={{ hideAttribution: true }}
         className="h-full w-full bg-transparent"
       >

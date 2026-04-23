@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Edge } from "@xyflow/react";
 import UserHeader from "../components/UserHeader";
 import UserFooter from "../components/UserFooter";
@@ -37,60 +37,34 @@ function getBucketKey(timestamp: string, granularity: TimeGranularity) {
   return getMonthKey(timestamp);
 }
 
+function compareBuckets(a: string, b: string) {
+  return a.localeCompare(b);
+}
+
 export default function Page() {
   const [datasetIds, setDatasetIds] = useState<string[]>([]);
   const [selectedDataset, setSelectedDataset] = useState("");
   const [error, setError] = useState("");
-  const [timeGranularity, setTimeGranularity] = useState<TimeGranularity>("week");
+  const [timeGranularity, setTimeGranularity] =
+    useState<TimeGranularity>("week");
   const [sliderLow, setSliderLow] = useState(0);
-  const [sliderHigh, setSliderHigh] = useState(2);
+  const [sliderHigh, setSliderHigh] = useState(1);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("map");
   const [messages, setMessages] = useState<Message[]>([]);
-
-
+  const [topicSummaries, setTopicSummaries] = useState<Record<string, string>>(
+    {}
+  );
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<BaseGraphNode | null>(null);
   const [topicSheetOpen, setTopicSheetOpen] = useState(false);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<{
+    start: string;
+    end: string;
+  } | null>(null);
 
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const messagesById: Record<string, Message> = Object.fromEntries(
-    messages.map((msg) => [msg.id, msg])
-  );
-
-  const parentMessage = selectedMessage ? 
-    messagesById[selectedMessage.parentId ?? selectedMessage.inferredReplyToId ?? ""] ?? null : null;
-
-  const nodesData: BaseGraphNode[] = messages.map((msg, index) => ({
-    id: msg.id,
-    parentId: msg.parentId ?? msg.inferredReplyToId ?? null,
-    position: { x: 40, y: 40 + index * 320 },
-    topicTitle: msg.topic ?? "Unknown topic",
-    aiSummary: msg.topic ?? "No summary available.",
-    senderName: msg.author,
-    messageText: msg.text,
-    timestamp: msg.timestamp,
-    sentiment: msg.sentiment,
-    inferredReplyToId: msg.inferredReplyToId,
-    replyInferred: msg.replyInferred,
-    isRoot: !(msg.parentId ?? msg.inferredReplyToId),
-    hasChildren: messages.some(
-      (other) => (other.parentId ?? other.inferredReplyToId ?? null) === msg.id
-    ),
-  }));
-
-  const edgesData: Edge[] = messages
-    .filter((msg) => msg.parentId ?? msg.inferredReplyToId)
-    .map((msg) => {
-      const parentId = msg.parentId ?? msg.inferredReplyToId ?? "";
-      return {
-        id: `e-${parentId}-${msg.id}`,
-        source: parentId,
-        target: msg.id,
-        style: { stroke: "#8BA07A", strokeWidth: 1.5 },
-      };
-  });
 
   const availableTimeBuckets = useMemo(() => {
     const unique = new Set(
@@ -103,9 +77,22 @@ export default function Page() {
     return availableTimeBuckets.filter((b) => b !== "all");
   }, [availableTimeBuckets]);
 
+  const timeFilteredMessages = useMemo(() => {
+    if (!selectedTimeRange) return messages;
+
+    return messages.filter((msg) => {
+      const bucket = getBucketKey(msg.timestamp, timeGranularity);
+      return (
+        compareBuckets(bucket, selectedTimeRange.start) >= 0 &&
+        compareBuckets(bucket, selectedTimeRange.end) <= 0
+      );
+    });
+  }, [messages, selectedTimeRange, timeGranularity]);
+
   const availableTopics = useMemo(() => {
     const topicSet = new Set<string>();
-    messages.forEach((msg) => {
+
+    timeFilteredMessages.forEach((msg) => {
       if (msg.topic && msg.topic !== "unknown") {
         topicSet.add(msg.topic);
       }
@@ -118,64 +105,166 @@ export default function Page() {
 
     if (topics.includes("other")) withoutOther.push("other");
     return withoutOther;
-  }, [messages]);
+  }, [timeFilteredMessages]);
+
+  const displayedMessages = useMemo(() => {
+    if (selectedTopics.length === 0) return timeFilteredMessages;
+
+    return timeFilteredMessages.filter(
+      (msg) => msg.topic && selectedTopics.includes(msg.topic)
+    );
+  }, [timeFilteredMessages, selectedTopics]);
+
+  const messagesById: Record<string, Message> = useMemo(
+    () => Object.fromEntries(displayedMessages.map((msg) => [msg.id, msg])),
+    [displayedMessages]
+  );
+
+  const parentMessage = selectedMessage
+    ? messagesById[
+        selectedMessage.parentId ?? selectedMessage.inferredReplyToId ?? ""
+      ] ?? null
+    : null;
+
+  const nodesData: BaseGraphNode[] = useMemo(
+    () =>
+      displayedMessages.map((msg, index) => ({
+        id: msg.id,
+        parentId: msg.parentId ?? msg.inferredReplyToId ?? null,
+        position: { x: 40, y: 40 + index * 320 },
+        topicTitle: msg.topic ?? "Unknown topic",
+        aiSummary:
+          !(msg.parentId ?? msg.inferredReplyToId)
+            ? topicSummaries[msg.id] ?? "No summary available."
+            : "No summary available.",
+        senderName: msg.author,
+        messageText: msg.text,
+        timestamp: msg.timestamp,
+        sentiment: msg.sentiment,
+        inferredReplyToId: msg.inferredReplyToId,
+        replyInferred: msg.replyInferred,
+        isRoot: !(msg.parentId ?? msg.inferredReplyToId),
+        hasChildren: displayedMessages.some(
+          (other) =>
+            (other.parentId ?? other.inferredReplyToId ?? null) === msg.id
+        ),
+      })),
+    [displayedMessages, topicSummaries]
+  );
+
+  const edgesData: Edge[] = useMemo(
+    () =>
+      displayedMessages
+        .filter((msg) => msg.parentId ?? msg.inferredReplyToId)
+        .map((msg) => {
+          const parentId = msg.parentId ?? msg.inferredReplyToId ?? "";
+          return {
+            id: `e-${parentId}-${msg.id}`,
+            source: parentId,
+            target: msg.id,
+            style: { stroke: "#8BA07A", strokeWidth: 1.5 },
+          };
+        })
+        .filter(
+          (edge) =>
+            displayedMessages.some((m) => m.id === edge.source) &&
+            displayedMessages.some((m) => m.id === edge.target)
+        ),
+    [displayedMessages]
+  );
 
   const roots = useMemo(() => {
-  return messages.filter((m) => !(m.parentId ?? m.inferredReplyToId)).length;
-}, [messages]);
+    return displayedMessages.filter((m) => !(m.parentId ?? m.inferredReplyToId))
+      .length;
+  }, [displayedMessages]);
 
-const depth = useMemo(() => {
-  const byId = Object.fromEntries(messages.map((m) => [m.id, m]));
+  const depth = useMemo(() => {
+    const byId = Object.fromEntries(displayedMessages.map((m) => [m.id, m]));
 
-  const depthOf = (msg: Message): number => {
-    let d = 1;
-    let cur = msg;
+    const depthOf = (msg: Message): number => {
+      let d = 1;
+      let cur = msg;
 
-    while ((cur.parentId ?? cur.inferredReplyToId) && byId[cur.parentId ?? cur.inferredReplyToId ?? ""]) {
-      d += 1;
-      cur = byId[cur.parentId ?? cur.inferredReplyToId ?? ""];
-    }
+      while (
+        (cur.parentId ?? cur.inferredReplyToId) &&
+        byId[cur.parentId ?? cur.inferredReplyToId ?? ""]
+      ) {
+        d += 1;
+        cur = byId[cur.parentId ?? cur.inferredReplyToId ?? ""];
+      }
 
-    return d;
-  };
+      return d;
+    };
 
-  return messages.length ? Math.max(...messages.map(depthOf)) : 0;
-}, [messages]);
+    return displayedMessages.length
+      ? Math.max(...displayedMessages.map(depthOf))
+      : 0;
+  }, [displayedMessages]);
 
-const sentimentStats = useMemo(() => {
-  const value = (sentiment?: string) => {
-    switch (sentiment) {
-      case "supportive":
-        return 1;
-      case "critical":
-        return -1;
-      default:
-        return 0;
-    }
-  };
+  const sentimentStats = useMemo(() => {
+    const value = (sentiment?: string) => {
+      switch (sentiment) {
+        case "supportive":
+          return 1;
+        case "critical":
+          return -1;
+        default:
+          return 0;
+      }
+    };
 
-  const total = messages.reduce((sum, m) => sum + value(m.sentiment), 0);
-  const avg = messages.length ? total / messages.length : 0;
+    const total = displayedMessages.reduce(
+      (sum, m) => sum + value(m.sentiment),
+      0
+    );
+    const avg = displayedMessages.length ? total / displayedMessages.length : 0;
 
-  const supportive = messages.filter((m) => m.sentiment === "supportive").length;
-  const neutral = messages.filter(
-    (m) => !m.sentiment || m.sentiment === "neutral" || m.sentiment === "mixed"
-  ).length;
-  const critical = messages.filter((m) => m.sentiment === "critical").length;
+    const supportive = displayedMessages.filter(
+      (m) => m.sentiment === "supportive"
+    ).length;
+    const neutral = displayedMessages.filter(
+      (m) =>
+        !m.sentiment || m.sentiment === "neutral" || m.sentiment === "mixed"
+    ).length;
+    const critical = displayedMessages.filter(
+      (m) => m.sentiment === "critical"
+    ).length;
 
-  const totalCount = supportive + neutral + critical || 1;
+    const totalCount = supportive + neutral + critical || 1;
 
-  return {
-    avg,
-    supportivePct: (supportive / totalCount) * 100,
-    neutralPct: (neutral / totalCount) * 100,
-    criticalPct: (critical / totalCount) * 100,
-  };
-}, [messages]);
+    return {
+      avg,
+      supportivePct: (supportive / totalCount) * 100,
+      neutralPct: (neutral / totalCount) * 100,
+      criticalPct: (critical / totalCount) * 100,
+    };
+  }, [displayedMessages]);
 
   function handleSliderChange(lo: number, hi: number) {
-    setSliderLow(lo);
-    setSliderHigh(hi);
+    const maxHigh = Math.max(usableTimeBuckets.length, 1);
+    const nextLow = Math.max(0, Math.min(lo, Math.max(maxHigh - 1, 0)));
+    const nextHigh = Math.max(nextLow + 1, Math.min(hi, maxHigh));
+
+    setSliderLow(nextLow);
+    setSliderHigh(nextHigh);
+
+    if (usableTimeBuckets.length === 0) {
+      setSelectedTimeRange(null);
+      return;
+    }
+
+    const startBucket = usableTimeBuckets[nextLow];
+    const endBucket = usableTimeBuckets[nextHigh - 1];
+
+    if (!startBucket || !endBucket) {
+      setSelectedTimeRange(null);
+      return;
+    }
+
+    setSelectedTimeRange({
+      start: startBucket,
+      end: endBucket,
+    });
   }
 
   function handleToggleTopic(topic: string) {
@@ -258,7 +347,6 @@ const sentimentStats = useMemo(() => {
 
         const data = await res.json();
         const ids = Array.isArray(data.datasets) ? data.datasets : [];
-
         setDatasetIds(ids);
 
         if (ids.length > 0) {
@@ -275,10 +363,45 @@ const sentimentStats = useMemo(() => {
   useEffect(() => {
     if (!selectedDataset) return;
 
+    async function loadTopicSummaries() {
+      try {
+        const res = await fetch(
+          `/api/discussions/${selectedDataset}/messages/ai-summary`
+        );
+        if (!res.ok) {
+          throw new Error(`Failed to load AI summaries: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        const mapped = Object.fromEntries(
+          (data.summaries ?? []).map(
+            (item: { root_id: string; summary: string }) => [
+              item.root_id,
+              item.summary,
+            ]
+          )
+        );
+
+        setTopicSummaries(mapped);
+      } catch (err) {
+        console.error(err);
+        setTopicSummaries({});
+      }
+    }
+
+    loadTopicSummaries();
+  }, [selectedDataset]);
+
+  useEffect(() => {
+    if (!selectedDataset) return;
+
     async function loadMessages() {
       try {
         setError("");
-        const res = await fetch(`/api/discussions/${selectedDataset}/messages/annotated`);
+        const res = await fetch(
+          `/api/discussions/${selectedDataset}/messages/annotated`
+        );
         if (!res.ok) {
           throw new Error(`Failed to load messages: ${res.status}`);
         }
@@ -300,12 +423,39 @@ const sentimentStats = useMemo(() => {
     if (usableTimeBuckets.length === 0) {
       setSliderLow(0);
       setSliderHigh(1);
+      setSelectedTimeRange(null);
       return;
     }
 
     setSliderLow(0);
     setSliderHigh(usableTimeBuckets.length);
+    setSelectedTimeRange(null);
   }, [usableTimeBuckets]);
+
+  useEffect(() => {
+    setSelectedTopics((prev) =>
+      prev.filter((topic) => availableTopics.includes(topic))
+    );
+  }, [availableTopics]);
+
+  useEffect(() => {
+    if (
+      selectedMessage &&
+      !displayedMessages.some((m) => m.id === selectedMessage.id)
+    ) {
+      setSelectedMessage(null);
+      setSheetOpen(false);
+    }
+  }, [displayedMessages, selectedMessage]);
+
+  const safeSliderLow = Math.max(
+    0,
+    Math.min(sliderLow, Math.max(usableTimeBuckets.length - 1, 0))
+  );
+  const safeSliderHigh = Math.max(
+    safeSliderLow + 1,
+    Math.min(sliderHigh, Math.max(usableTimeBuckets.length, 1))
+  );
 
   return (
     <main className="h-dvh bg-[#f3f5f1]">
@@ -318,8 +468,8 @@ const sentimentStats = useMemo(() => {
           onChangeGranularity={setTimeGranularity}
           availableTimeBuckets={availableTimeBuckets}
           usableTimeBuckets={usableTimeBuckets}
-          sliderLow={sliderLow}
-          sliderHigh={sliderHigh}
+          sliderLow={safeSliderLow}
+          sliderHigh={safeSliderHigh}
           onSliderChange={handleSliderChange}
           availableTopics={availableTopics}
           selectedTopics={selectedTopics}
@@ -343,7 +493,7 @@ const sentimentStats = useMemo(() => {
             </div>
           ) : (
             <UserChatView
-              messages={messages}
+              messages={displayedMessages}
               messagesById={messagesById}
               messageRefs={messageRefs}
               selectedMessage={selectedMessage}
@@ -359,7 +509,7 @@ const sentimentStats = useMemo(() => {
 
         <div className="shrink-0">
           <UserFooter
-            messageCount={messages.length}
+            messageCount={displayedMessages.length}
             roots={roots}
             depth={depth}
             sentimentStats={sentimentStats}
@@ -385,6 +535,4 @@ const sentimentStats = useMemo(() => {
       </div>
     </main>
   );
-
-
 }
