@@ -63,45 +63,6 @@ UI available at: **http://localhost:3000**
 
 ---
 
-## 🐳 Docker 部署（快速开始）
-
-### 使用 Docker Compose（需要安装 Docker）
-
-```bash
-# macOS 安装 Docker
-brew install docker docker-compose
-
-# 启动完整应用栈
-docker-compose up
-
-# 访问
-# 前端: http://localhost:3000
-# 后端: http://localhost:8000
-# API 文档: http://localhost:8000/docs
-```
-
----
-
-## ☁️ 云端部署
-
-### 推荐方案：Render (后端) + Vercel (前端)
-
-| 组件 | 平台 | 免费层 | 部署时间 |
-|-----|------|------|--------|
-| 后端 | [Render](https://render.com) | ✅ 有 | 2-3 分钟 |
-| 前端 | [Vercel](https://vercel.com) | ✅ 有 | 1-2 分钟 |
-
-**快速部署步骤**：
-1. 推送代码到 GitHub
-2. 在 Render 连接后端（`backend/` 文件夹）
-3. 在 Vercel 连接前端（`frontend/` 文件夹）
-4. 配置环境变量
-5. 完成！
-
-**详见 [`DEPLOYMENT.md`](./DEPLOYMENT.md) 获取完整说明。**
-
----
-
 ## ✨ Key Features
 
 ### Backend
