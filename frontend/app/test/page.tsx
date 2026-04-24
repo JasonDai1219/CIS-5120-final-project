@@ -11,6 +11,7 @@ import UserThreadMapView, {
 import UserChatView from "../components/UserChatView";
 import UserMessageDetailSheet from "../components/UserMessageDetailSheet";
 import TopicDetailSheet from "../components/TopicDetailSheet";
+import TimeSlider from "../components/TimeSlider";
 
 type TimeGranularity = "day" | "week" | "month";
 type ViewMode = "map" | "chat";
@@ -608,16 +609,90 @@ export default function Page() {
             <div className="p-4 text-sm text-red-700">{error}</div>
           ) : isFullscreen ? (
             // Fullscreen mode
-            <div className="fixed inset-0 z-50 flex flex-col bg-[#f8faf7]">
-              <div className="flex items-center justify-between border-b border-[#d4ddd0] px-4 py-2 bg-white">
-                <h2 className="text-sm font-semibold text-[#2B3A2B]">Thread Map - Fullscreen</h2>
-                <button
-                  onClick={() => setIsFullscreen(false)}
-                  className="rounded-lg px-3 py-1 text-xs font-medium bg-[#8BA07A] text-white hover:bg-[#7a9469] transition"
-                >
-                  Exit Fullscreen
-                </button>
+            <div className="fixed inset-0 z-50 flex flex-col bg-[#f8faf7]" style={{ overflow: "visible" }}>
+              <div className="border-b border-[#d4ddd0] bg-white px-4 py-3 space-y-3" style={{ overflow: "visible" }}>
+                {/* Header with title and exit button */}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-[#2B3A2B]">Thread Map - Fullscreen</h2>
+                  <button
+                    onClick={() => setIsFullscreen(false)}
+                    className="rounded-lg px-3 py-1 text-xs font-medium bg-[#8BA07A] text-white hover:bg-[#7a9469] transition"
+                  >
+                    Exit Fullscreen
+                  </button>
+                </div>
+
+                {/* Time range selector */}
+                <div className="flex items-center justify-center gap-2 border-b border-[#e8eae5] pb-3">
+                  <select
+                    value={usableTimeBuckets[safeSliderLow] ?? ""}
+                    onChange={(e) => {
+                      const nextLow = usableTimeBuckets.indexOf(e.target.value);
+                      if (nextLow === -1) return;
+                      const nextHigh = Math.max(safeSliderHigh, nextLow + 1);
+                      handleSliderChange(nextLow, nextHigh);
+                    }}
+                    className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
+                  >
+                    {usableTimeBuckets.map((bucket, index) => (
+                      <option key={bucket} value={bucket} disabled={index >= safeSliderHigh}>
+                        Week {bucket}
+                      </option>
+                    ))}
+                  </select>
+
+                  <span className="text-[11px] font-medium text-[#5C7A4E]">to</span>
+
+                  <select
+                    value={usableTimeBuckets[safeSliderHigh - 1] ?? ""}
+                    onChange={(e) => {
+                      const endIndex = usableTimeBuckets.indexOf(e.target.value);
+                      if (endIndex === -1) return;
+                      const nextHigh = endIndex + 1;
+                      const nextLow = Math.min(safeSliderLow, endIndex);
+                      handleSliderChange(nextLow, nextHigh);
+                    }}
+                    className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
+                  >
+                    {usableTimeBuckets.map((bucket, index) => (
+                      <option key={bucket} value={bucket} disabled={index < safeSliderLow}>
+                        Week {bucket}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Topic filter */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-[#2B3A2B]">Topics</label>
+                    {selectedTopics.length > 0 && (
+                      <button
+                        onClick={handleClearTopics}
+                        className="text-xs text-[#8BA07A] hover:text-[#7a9469] font-medium"
+                      >
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTopics.map((topic) => (
+                      <button
+                        key={topic}
+                        onClick={() => handleToggleTopic(topic)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                          selectedTopics.includes(topic)
+                            ? "bg-[#8BA07A] text-white"
+                            : "bg-[#e8eae5] text-[#2B3A2B] hover:bg-[#dcddd8]"
+                        }`}
+                      >
+                        {topic}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
+
               <div className="flex-1 min-h-0 overflow-hidden">
                 <UserThreadMapView
                   nodesData={nodesData}

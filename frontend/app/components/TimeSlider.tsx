@@ -43,6 +43,7 @@ export default function TimeSlider({
   useEffect(() => {
     const handleMove = (e: PointerEvent) => {
       if (!draggingRef.current) return;
+      if (segments <= 0) return; // Don't allow dragging when only 1 segment
 
       const boundary = getBoundaryFromPointer(e.clientX);
 
@@ -71,11 +72,12 @@ export default function TimeSlider({
   const lowPct = toPercent(low);
   const highPct = toPercent(high);
 
-  if (segments <= 0) return null;
+  // Show a disabled slider even when segments <= 0 (single time period)
+  if (segments < 0) return null;
 
   return (
     <div style={{ width: "100%", userSelect: "none" }}>
-      <div style={{ position: "relative", width: "100%", padding: "0 10px" }}>
+      <div style={{ position: "relative", width: "100%", padding: "0 10px", overflow: "visible" }}>
         <div
           ref={trackRef}
           style={{
@@ -143,7 +145,9 @@ export default function TimeSlider({
             tabIndex={0}
             onPointerDown={(e) => {
               e.preventDefault();
-              draggingRef.current = "low";
+              if (segments > 0) {
+                draggingRef.current = "low";
+              }
             }}
             whileTap={{ scale: 1.08 }}
             animate={{
@@ -163,9 +167,10 @@ export default function TimeSlider({
               background: "#3D6B35",
               border: "2px solid white",
               boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-              cursor: "grab",
+              cursor: segments > 0 ? "grab" : "not-allowed",
               zIndex: 20,
               touchAction: "none",
+              opacity: segments > 0 ? 1 : 0.6,
             }}
           />
 
@@ -177,7 +182,9 @@ export default function TimeSlider({
             tabIndex={0}
             onPointerDown={(e) => {
               e.preventDefault();
-              draggingRef.current = "high";
+              if (segments > 0) {
+                draggingRef.current = "high";
+              }
             }}
             whileTap={{ scale: 1.08 }}
             animate={{
@@ -197,9 +204,10 @@ export default function TimeSlider({
               background: "#3D6B35",
               border: "2px solid white",
               boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-              cursor: "grab",
+              cursor: segments > 0 ? "grab" : "not-allowed",
               zIndex: 20,
               touchAction: "none",
+              opacity: segments > 0 ? 1 : 0.6,
             }}
           />
         </div>
