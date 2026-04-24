@@ -1,0 +1,114 @@
+[
+  {
+    "id": "acad1",
+    "author": "Professor Chen",
+    "timestamp": "2026-04-10T08:30:00Z",
+    "text": "Has anyone reviewed the latest paper on transformer architectures? Very interesting findings.",
+    "parentId": null
+  },
+  {
+    "id": "acad2",
+    "author": "Graduate Student A",
+    "timestamp": "2026-04-10T09:00:00Z",
+    "text": "Yes! The attention mechanism improvements are quite elegant. However, the computational cost seems prohibitive.",
+    "parentId": "acad1"
+  },
+  {
+    "id": "acad3",
+    "author": "PostDoc B",
+    "timestamp": "2026-04-10T09:15:00Z",
+    "text": "I disagree. The efficiency gains outweigh the computational overhead significantly.",
+    "parentId": "acad2"
+  },
+  {
+    "id": "acad4",
+    "author": "Graduate Student A",
+    "timestamp": "2026-04-10T09:30:00Z",
+    "text": "Fair point, but only for large-scale deployments. For research purposes, it's still expensive.",
+    "parentId": "acad3"
+  },
+  {
+    "id": "acad5",
+    "author": "Professor Chen",
+    "timestamp": "2026-04-10T09:45:00Z",
+    "text": "Both perspectives are valid. We should explore cost-benefit tradeoffs in our project.",
+    "parentId": "acad4"
+  },
+  {
+    "id": "acad6",
+    "author": "Graduate Student C",
+    "timestamp": "2026-04-11T10:00:00Z",
+    "text": "I'm stuck on the dataset preprocessing step. The data quality is inconsistent.",
+    "parentId": null
+  },
+  {
+    "id": "acad7",
+    "author": "PostDoc B",
+    "timestamp": "2026-04-11T10:20:00Z",
+    "text": "That's a common issue. Have you applied normalization techniques?",
+    "parentId": "acad6"
+  },
+  {
+    "id": "acad8",
+    "author": "Graduate Student C",
+    "timestamp": "2026-04-11T10:35:00Z",
+    "text": "Yes, but the outliers are still problematic. Any suggestions?",
+    "parentId": "acad7"
+  },
+  {
+    "id": "acad9",
+    "author": "PostDoc B",
+    "timestamp": "2026-04-11T10:50:00Z",
+    "text": "Try robust statistical methods like median absolute deviation. I can share references.",
+    "parentId": "acad8"
+  },
+  {
+    "id": "acad10",
+    "author": "Graduate Student C",
+    "timestamp": "2026-04-11T11:00:00Z",
+    "text": "That would be very helpful! Thank you for the guidance.",
+    "parentId": "acad9"
+  },
+  {
+    "id": "acad11",
+    "author": "Professor Chen",
+    "timestamp": "2026-04-12T14:00:00Z",
+    "text": "Our research proposal was accepted! Let's discuss the next steps and timeline.",
+    "parentId": null
+  },
+  {
+    "id": "acad12",
+    "author": "Graduate Student A",
+    "timestamp": "2026-04-12T14:30:00Z",
+    "text": "Excellent news! Congratulations! When do we start the experiments?",
+    "parentId": "acad11"
+  },
+  {
+    "id": "acad13",
+    "author": "Professor Chen",
+    "timestamp": "2026-04-12T14:45:00Z",
+    "text": "Next month. We need to finalize the experimental design first.",
+    "parentId": "acad12"
+  },
+  {
+    "id": "acad14",
+    "author": "PostDoc B",
+    "timestamp": "2026-04-12T15:00:00Z",
+    "text": "I can draft the detailed methodology section. Should have it ready by end of week.",
+    "parentId": "acad13"
+  },
+  {
+    "id": "acad15",
+    "author": "Graduate Student C",
+    "timestamp": "2026-04-12T15:15:00Z",
+    "text": "I'll prepare the literature review supplement. Excited to get started!",
+    "parentId": "acad13"
+  },
+  {
+    "id": "acad16",
+    "author": "Professor Chen",
+    "timestamp": "2026-04-12T15:30:00Z",
+    "text": "Perfect. Let's have a kickoff meeting next week to align everyone.",
+    "parentId": "acad15"
+  }
+]

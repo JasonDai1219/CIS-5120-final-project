@@ -1,0 +1,114 @@
+[
+  {
+    "id": "test1",
+    "author": "Sarah",
+    "timestamp": "2026-04-01T08:00:00Z",
+    "text": "Has anyone figured out how to optimize the database queries?",
+    "parentId": null
+  },
+  {
+    "id": "test2",
+    "author": "Mike",
+    "timestamp": "2026-04-01T08:15:00Z",
+    "text": "I've been working on that! Using indexes really helped.",
+    "parentId": "test1"
+  },
+  {
+    "id": "test3",
+    "author": "Sarah",
+    "timestamp": "2026-04-01T08:20:00Z",
+    "text": "Great tip! Did you see a significant performance improvement?",
+    "parentId": "test2"
+  },
+  {
+    "id": "test4",
+    "author": "Mike",
+    "timestamp": "2026-04-01T08:25:00Z",
+    "text": "Absolutely! Query time dropped from 5 seconds to 200ms.",
+    "parentId": "test3"
+  },
+  {
+    "id": "test5",
+    "author": "Lisa",
+    "timestamp": "2026-04-01T09:00:00Z",
+    "text": "That's impressive! I need to implement this in my project too.",
+    "parentId": "test2"
+  },
+  {
+    "id": "test6",
+    "author": "James",
+    "timestamp": "2026-04-02T10:00:00Z",
+    "text": "The new API design looks really solid. Any concerns?",
+    "parentId": null
+  },
+  {
+    "id": "test7",
+    "author": "Alex",
+    "timestamp": "2026-04-02T10:30:00Z",
+    "text": "I like the structure, but the authentication flow seems complex.",
+    "parentId": "test6"
+  },
+  {
+    "id": "test8",
+    "author": "James",
+    "timestamp": "2026-04-02T10:45:00Z",
+    "text": "We can simplify that. Let me refactor the auth middleware.",
+    "parentId": "test7"
+  },
+  {
+    "id": "test9",
+    "author": "Emma",
+    "timestamp": "2026-04-02T11:00:00Z",
+    "text": "I think error handling could be better too.",
+    "parentId": "test6"
+  },
+  {
+    "id": "test10",
+    "author": "Alex",
+    "timestamp": "2026-04-02T11:15:00Z",
+    "text": "Good point, Emma. More comprehensive error messages would help.",
+    "parentId": "test9"
+  },
+  {
+    "id": "test11",
+    "author": "James",
+    "timestamp": "2026-04-02T11:30:00Z",
+    "text": "I'll add better error codes and descriptions.",
+    "parentId": "test9"
+  },
+  {
+    "id": "test12",
+    "author": "Chris",
+    "timestamp": "2026-04-03T14:00:00Z",
+    "text": "The deployment process is still too manual. We need automation.",
+    "parentId": null
+  },
+  {
+    "id": "test13",
+    "author": "Rachel",
+    "timestamp": "2026-04-03T14:20:00Z",
+    "text": "Totally agree. CI/CD pipeline would save us so much time.",
+    "parentId": "test12"
+  },
+  {
+    "id": "test14",
+    "author": "Chris",
+    "timestamp": "2026-04-03T14:35:00Z",
+    "text": "I've been researching GitHub Actions. Seems like a good fit.",
+    "parentId": "test13"
+  },
+  {
+    "id": "test15",
+    "author": "Tom",
+    "timestamp": "2026-04-03T14:50:00Z",
+    "text": "GitHub Actions is great, but we should also consider Jenkins.",
+    "parentId": "test13"
+  },
+  {
+    "id": "test16",
+    "author": "Rachel",
+    "timestamp": "2026-04-03T15:00:00Z",
+    "text": "Both are solid options. GitHub Actions is simpler for our setup.",
+    "parentId": "test15"
+  }
+]

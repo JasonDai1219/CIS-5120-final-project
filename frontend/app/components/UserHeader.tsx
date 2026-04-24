@@ -24,6 +24,10 @@ type Props = {
 
     viewMode: ViewMode;
     onChangeViewMode: (mode: ViewMode) => void;
+
+    onFileUpload: (file: File) => void;
+    uploadError?: string;
+    uploadSuccess?: string;
 };
 
 function formatBucketLabel(bucket: string, granularity: TimeGranularity) {
@@ -56,11 +60,23 @@ export default function UserHeader({
     onClearTopics,
     viewMode,
     onChangeViewMode,
+    onFileUpload,
+    uploadError,
+    uploadSuccess,
 }: Props) {
     const segments = Math.max(
         availableTimeBuckets.filter((b) => b !== "all").length,
         1
     );
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            onFileUpload(file);
+            // Reset input
+            e.target.value = "";
+        }
+    };
 
     const handleStartSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const nextLow = usableTimeBuckets.indexOf(e.target.value);
@@ -86,18 +102,52 @@ export default function UserHeader({
                     <div className="text-[15px] font-semibold tracking-[-0.3px] text-[#2B3A2B]">
                         Thread Map
                     </div>
-                    {datasetIds.length > 1 && (
-                        <select
-                            value={selectedDataset}
-                            onChange={(e) => onSelectDataset(e.target.value)}
-                            className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
-                        >
-                            {datasetIds.map((id) => (
-                                <option key={id} value={id}>{id}</option>
-                            ))}
-                        </select>
-                    )}
+                    <div className="flex items-center gap-2">
+                        {datasetIds.length > 1 && (
+                            <select
+                                value={selectedDataset}
+                                onChange={(e) => onSelectDataset(e.target.value)}
+                                className="appearance-none rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 pr-8 text-xs font-medium text-[#2B3A2B] outline-none"
+                            >
+                                {datasetIds.map((id) => (
+                                    <option key={id} value={id}>{id}</option>
+                                ))}
+                            </select>
+                        )}
+                        <label className="cursor-pointer rounded-full border border-[#8BA07A] bg-[#8BA07A] px-3 py-1 text-xs font-medium text-white hover:bg-[#7a9469] transition">
+                            + Upload JSON
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
                 </div>
+
+                {/* Upload status messages */}
+                {uploadError && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                        {uploadError}
+                    </div>
+                )}
+                {uploadSuccess && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700 flex items-center gap-2">
+                        <style>{`
+                            @keyframes spin {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                            }
+                            .loading-spinner {
+                                animation: spin 1s linear infinite;
+                                display: inline-block;
+                            }
+                        `}</style>
+                        <span className="loading-spinner">⏳</span>
+                        {uploadSuccess}
+                    </div>
+                )}
 
                 {/* Row 2: granularity */}
                 <div className="flex items-center gap-2">

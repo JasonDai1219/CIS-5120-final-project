@@ -56,6 +56,7 @@ type GraphCardData = {
   isRoot: boolean;
   hasChildren: boolean;
   expanded: boolean;
+  isInPath: boolean;
   onToggle: () => void;
   onOpenMessage: () => void;
   onOpenTopic: () => void;
@@ -141,10 +142,37 @@ function sentimentBadgeClass(sentiment?: string) {
   }
 }
 
+function getTopicBadgeClass(topic?: string) {
+  if (!topic) return "bg-gray-100 text-gray-800";
+  
+  const colors = [
+    "bg-blue-100 text-blue-800",
+    "bg-purple-100 text-purple-800",
+    "bg-pink-100 text-pink-800",
+    "bg-indigo-100 text-indigo-800",
+    "bg-cyan-100 text-cyan-800",
+    "bg-teal-100 text-teal-800",
+    "bg-amber-100 text-amber-800",
+    "bg-orange-100 text-orange-800",
+  ];
+  
+  // 根据主题名称的哈希值选择颜色
+  let hash = 0;
+  for (let i = 0; i < topic.length; i++) {
+    hash = ((hash << 5) - hash) + topic.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  return colors[Math.abs(hash) % colors.length];
+}
+
 function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
   const cardMode = data.isRoot && !data.expanded ? "topic" : "node";
-  const showButton =
-    cardMode === "topic" || (cardMode === "node" && data.hasChildren);
+  // 显示按钮的条件：
+  // 1. 在 topic 模式（根节点未展开）
+  // 2. 在 node 模式且有子节点
+  // 3. 在 node 模式且是根节点（允许根节点即使没有子节点也能折叠）
+  const showButton = cardMode === "topic" || (cardMode === "node" && (data.hasChildren || data.isRoot));
 
   const nodeCardBgClass =
     data.sentiment === "critical"
@@ -168,9 +196,11 @@ function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
         style={{ width: 320, height: 180, boxSizing: "border-box" }}
-        className={`flex flex-col rounded-[16px] border border-[#d4ddd0] px-4 pt-4 shadow-md ${
-          cardMode === "node" ? nodeCardBgClass : "bg-white"
-        }`}
+        className={`flex flex-col rounded-[16px] px-4 pt-4 transition-all ${
+          data.isInPath
+            ? "border-4 border-[#2B3A2B] shadow-xl ring-2 ring-[#8BA07A]"
+            : "border border-[#d4ddd0] shadow-md"
+        } ${cardMode === "node" ? nodeCardBgClass : "bg-white"}`}
       >
         <button
           type="button"
@@ -263,7 +293,12 @@ function GraphCardNode({ data }: NodeProps<GraphCardNodeType>) {
                   {data.messageText}
                 </div>
 
-                <div className="mt-auto flex justify-end pt-2">
+                <div className="mt-auto flex flex-wrap items-center justify-end gap-1.5 pt-2">
+                  {data.topicTitle && (
+                    <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium ${getTopicBadgeClass(data.topicTitle)}`}>
+                      {data.topicTitle}
+                    </span>
+                  )}
                   <span
                     className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium ${sentimentBadgeClass(
                       data.sentiment
@@ -329,25 +364,37 @@ export default function UserThreadMapView({
 
   const visibleBaseNodes = useMemo(() => {
     function isVisible(node: BaseGraphNode): boolean {
-      if (node.parentId === null) return true;
-      const parent = nodeById.get(node.parentId);
+      // 根节点总是可见的
+      if (node.isRoot) return true;
+      
+      // 非根节点需要其父节点存在且被展开
+      const parent = nodeById.get(node.parentId ?? "");
       if (!parent) return false;
+      
+      // 父节点必须可见且被展开
       return isVisible(parent) && expandedIds.has(parent.id);
     }
 
     return nodesData
       .filter(isVisible)
-      .slice()
+      .map((node, index) => ({ node, originalIndex: index }))
       .sort((a, b) => {
-        if (a.parentId !== b.parentId) {
-          if (a.parentId === null && b.parentId !== null) return -1;
-          if (a.parentId !== null && b.parentId === null) return 1;
+        const aNode = a.node;
+        const bNode = b.node;
+        
+        if (aNode.parentId !== bNode.parentId) {
+          if (aNode.parentId === null && bNode.parentId !== null) return -1;
+          if (aNode.parentId !== null && bNode.parentId === null) return 1;
         }
 
-        return (
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
-      });
+        // 同一父节点的子节点按时间戳排序
+        const timeCompare = new Date(aNode.timestamp).getTime() - new Date(bNode.timestamp).getTime();
+        if (timeCompare !== 0) return timeCompare;
+        
+        // 时间戳相同时保持原始顺序
+        return a.originalIndex - b.originalIndex;
+      })
+      .map(({ node }) => node);
   }, [expandedIds, nodeById, nodesData]);
 
   const visibleNodeIds = useMemo(
@@ -380,6 +427,39 @@ export default function UserThreadMapView({
     };
   }, [visibleBaseNodes, visibleEdges]);
 
+  // 计算路径上的节点 ID（展开的节点 + 到根节点的祖先路径）
+  const pathNodeIds = useMemo(() => {
+    const pathIds = new Set<string>();
+    
+    // 对每个展开的节点，追踪从它到根节点的路径
+    for (const expandedId of expandedIds) {
+      let currentId: string | null = expandedId;
+      
+      while (currentId !== null) {
+        pathIds.add(currentId);
+        const node = nodeById.get(currentId);
+        if (!node) break;
+        currentId = node.parentId;
+      }
+    }
+    
+    return pathIds;
+  }, [expandedIds, nodeById]);
+
+  // 计算需要高亮（黑框）的节点ID
+  // 只有展开的节点以及从展开节点到根的路径需要黑框
+  const highlightNodeIds = useMemo(() => {
+    const highlight = new Set<string>();
+    
+    // 对每个展开的节点，只有该节点本身需要高亮
+    // 其子节点和父节点都不需要高亮，除非它们也被展开
+    for (const expandedId of expandedIds) {
+      highlight.add(expandedId);
+    }
+    
+    return highlight;
+  }, [expandedIds]);
+
   const nodes = useMemo<GraphCardNodeType[]>(
     () =>
       layoutedVisibleNodes.map((node) => ({
@@ -397,6 +477,7 @@ export default function UserThreadMapView({
           isRoot: node.isRoot,
           hasChildren: node.hasChildren,
           expanded: expandedIds.has(node.id),
+          isInPath: highlightNodeIds.has(node.id),
           onToggle: () => toggleNode(node.id),
           onOpenMessage: () =>
             onOpenMessage({
@@ -413,7 +494,7 @@ export default function UserThreadMapView({
           onOpenTopic: () => onOpenTopic(node),
         },
       })),
-    [layoutedVisibleNodes, expandedIds, onOpenMessage, onOpenTopic]
+    [layoutedVisibleNodes, expandedIds, highlightNodeIds, onOpenMessage, onOpenTopic]
   );
 
   const edges = visibleEdges;

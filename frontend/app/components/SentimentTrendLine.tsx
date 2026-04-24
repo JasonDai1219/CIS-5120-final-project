@@ -11,11 +11,12 @@ type Props = {
 };
 
 function scoreToColor(score: number) {
-  if (score >= 0.5) return "#16a34a";
-  if (score >= 0.15) return "#84cc16";
-  if (score > -0.15) return "#9ca3af";
-  if (score > -0.5) return "#f97316";
-  return "#dc2626";
+  // Normalize score to 0-1 range (assuming input is -1 to 1)
+  const normalized = (score + 1) / 2;
+  
+  if (normalized < 1/3) return "#16a34a"; // Green
+  if (normalized < 2/3) return "#eab308"; // Yellow
+  return "#dc2626"; // Red
 }
 
 export default function SentimentTrendLine({ data }: Props) {
@@ -70,6 +71,13 @@ export default function SentimentTrendLine({ data }: Props) {
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
     .join(" ");
 
+  // Calculate average score to determine line color
+  const avgScore = data.reduce((sum, p) => sum + p.score, 0) / data.length;
+  const normalized = (avgScore + 1) / 2;
+  let lineColor = "#16a34a"; // Green
+  if (normalized >= 1/3 && normalized < 2/3) lineColor = "#eab308"; // Yellow
+  else if (normalized >= 2/3) lineColor = "#dc2626"; // Red
+
   return (
     <div className="rounded-xl bg-white p-4 shadow">
       <h2 className="mb-3 text-lg font-semibold">Sentiment Over Time</h2>
@@ -110,7 +118,7 @@ export default function SentimentTrendLine({ data }: Props) {
         <path
           d={pathD}
           fill="none"
-          stroke="#9ca3af"
+          stroke={lineColor}
           strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"

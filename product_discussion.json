@@ -1,0 +1,121 @@
+[
+  {
+    "id": "prod1",
+    "author": "ProductManager",
+    "timestamp": "2026-04-05T09:00:00Z",
+    "text": "Should we prioritize mobile app redesign or backend optimization for Q2?",
+    "parentId": null
+  },
+  {
+    "id": "prod2",
+    "author": "DevLead",
+    "timestamp": "2026-04-05T09:15:00Z",
+    "text": "I vote for backend optimization. Current API response times are getting complaints.",
+    "parentId": "prod1"
+  },
+  {
+    "id": "prod3",
+    "author": "DesignLead",
+    "timestamp": "2026-04-05T09:20:00Z",
+    "text": "But user retention would improve significantly with a fresh mobile design.",
+    "parentId": "prod1"
+  },
+  {
+    "id": "prod4",
+    "author": "DevLead",
+    "timestamp": "2026-04-05T09:25:00Z",
+    "text": "Good point, but slow API kills UX anyway. We should fix that first.",
+    "parentId": "prod3"
+  },
+  {
+    "id": "prod5",
+    "author": "DesignLead",
+    "timestamp": "2026-04-05T09:30:00Z",
+    "text": "Fair enough. Maybe we can do both in parallel with different teams?",
+    "parentId": "prod4"
+  },
+  {
+    "id": "prod6",
+    "author": "ProductManager",
+    "timestamp": "2026-04-05T09:35:00Z",
+    "text": "That's a good compromise. Let's plan accordingly.",
+    "parentId": "prod5"
+  },
+  {
+    "id": "prod7",
+    "author": "QALead",
+    "timestamp": "2026-04-06T10:00:00Z",
+    "text": "We found critical bugs in the payment processing. This needs immediate attention.",
+    "parentId": null
+  },
+  {
+    "id": "prod8",
+    "author": "SecurityEngineer",
+    "timestamp": "2026-04-06T10:30:00Z",
+    "text": "How critical? Are customer funds at risk?",
+    "parentId": "prod7"
+  },
+  {
+    "id": "prod9",
+    "author": "QALead",
+    "timestamp": "2026-04-06T10:45:00Z",
+    "text": "Yes, there's a potential for duplicate charges in certain scenarios.",
+    "parentId": "prod8"
+  },
+  {
+    "id": "prod10",
+    "author": "SecurityEngineer",
+    "timestamp": "2026-04-06T10:50:00Z",
+    "text": "This is a priority-1 issue. We need to hotfix immediately.",
+    "parentId": "prod9"
+  },
+  {
+    "id": "prod11",
+    "author": "DevLead",
+    "timestamp": "2026-04-06T10:55:00Z",
+    "text": "I'm pulling together the team now. We can have a fix ready by EOD.",
+    "parentId": "prod10"
+  },
+  {
+    "id": "prod12",
+    "author": "ProductManager",
+    "timestamp": "2026-04-07T13:00:00Z",
+    "text": "The customer feedback on our new analytics dashboard has been positive overall.",
+    "parentId": null
+  },
+  {
+    "id": "prod13",
+    "author": "AnalyticsEngineer",
+    "timestamp": "2026-04-07T13:20:00Z",
+    "text": "Great to hear! What specific features did they like most?",
+    "parentId": "prod12"
+  },
+  {
+    "id": "prod14",
+    "author": "ProductManager",
+    "timestamp": "2026-04-07T13:35:00Z",
+    "text": "The real-time data visualization and custom report generation were hits.",
+    "parentId": "prod13"
+  },
+  {
+    "id": "prod15",
+    "author": "AnalyticsEngineer",
+    "timestamp": "2026-04-07T13:45:00Z",
+    "text": "Excellent. We should expand those features in the next release.",
+    "parentId": "prod14"
+  },
+  {
+    "id": "prod16",
+    "author": "DesignLead",
+    "timestamp": "2026-04-07T14:00:00Z",
+    "text": "I'd suggest improving the dashboard layout for mobile devices too.",
+    "parentId": "prod14"
+  },
+  {
+    "id": "prod17",
+    "author": "ProductManager",
+    "timestamp": "2026-04-07T14:10:00Z",
+    "text": "Good idea. Mobile optimization would definitely increase usage.",
+    "parentId": "prod16"
+  }
+]

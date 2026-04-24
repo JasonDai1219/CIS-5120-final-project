@@ -1,0 +1,135 @@
+[
+  {
+    "id": "support1",
+    "author": "Customer_John",
+    "timestamp": "2026-04-15T10:00:00Z",
+    "text": "I'm experiencing issues with the login feature. Getting an error 401 on every attempt.",
+    "parentId": null
+  },
+  {
+    "id": "support2",
+    "author": "Support_Agent_Lisa",
+    "timestamp": "2026-04-15T10:30:00Z",
+    "text": "Sorry to hear that! Let me help. Can you tell me your browser and OS details?",
+    "parentId": "support1"
+  },
+  {
+    "id": "support3",
+    "author": "Customer_John",
+    "timestamp": "2026-04-15T10:45:00Z",
+    "text": "Chrome on Windows 11. I've tried clearing cache but still doesn't work.",
+    "parentId": "support2"
+  },
+  {
+    "id": "support4",
+    "author": "Support_Agent_Lisa",
+    "timestamp": "2026-04-15T11:00:00Z",
+    "text": "Thanks! Try resetting your password. If that doesn't work, I can escalate this.",
+    "parentId": "support3"
+  },
+  {
+    "id": "support5",
+    "author": "Customer_John",
+    "timestamp": "2026-04-15T11:20:00Z",
+    "text": "Great! Password reset worked! Thank you so much for the quick help.",
+    "parentId": "support4"
+  },
+  {
+    "id": "support6",
+    "author": "Customer_Sarah",
+    "timestamp": "2026-04-16T09:00:00Z",
+    "text": "The mobile app keeps crashing when I try to upload photos. Very frustrating!",
+    "parentId": null
+  },
+  {
+    "id": "support7",
+    "author": "Support_Agent_Mike",
+    "timestamp": "2026-04-16T09:30:00Z",
+    "text": "I'm sorry you're experiencing this. What's your app version and phone model?",
+    "parentId": "support6"
+  },
+  {
+    "id": "support8",
+    "author": "Customer_Sarah",
+    "timestamp": "2026-04-16T09:45:00Z",
+    "text": "App version 3.2.1, iPhone 14 Pro. It happens with any photo, even small ones.",
+    "parentId": "support7"
+  },
+  {
+    "id": "support9",
+    "author": "Support_Agent_Mike",
+    "timestamp": "2026-04-16T10:00:00Z",
+    "text": "This might be a known issue. Can you try updating to version 3.2.2? Should be available now.",
+    "parentId": "support8"
+  },
+  {
+    "id": "support10",
+    "author": "Customer_Sarah",
+    "timestamp": "2026-04-16T10:30:00Z",
+    "text": "Updated and it's working perfectly now! You're amazing, thanks!",
+    "parentId": "support9"
+  },
+  {
+    "id": "support11",
+    "author": "Customer_Tom",
+    "timestamp": "2026-04-17T14:00:00Z",
+    "text": "I want to cancel my subscription but can't find the option in settings.",
+    "parentId": null
+  },
+  {
+    "id": "support12",
+    "author": "Support_Agent_Lisa",
+    "timestamp": "2026-04-17T14:15:00Z",
+    "text": "I can help with that. Go to Account > Subscription > Manage Plan. You'll see the cancel option there.",
+    "parentId": "support11"
+  },
+  {
+    "id": "support13",
+    "author": "Customer_Tom",
+    "timestamp": "2026-04-17T14:30:00Z",
+    "text": "Found it! One more thing - can I get a refund for the current month?",
+    "parentId": "support12"
+  },
+  {
+    "id": "support14",
+    "author": "Support_Agent_Lisa",
+    "timestamp": "2026-04-17T14:45:00Z",
+    "text": "Unfortunately, our policy only allows refunds within 7 days of purchase. Your subscription is older.",
+    "parentId": "support13"
+  },
+  {
+    "id": "support15",
+    "author": "Customer_Tom",
+    "timestamp": "2026-04-17T15:00:00Z",
+    "text": "Understand. Well, thanks anyway. I appreciate the clarification on the policy.",
+    "parentId": "support14"
+  },
+  {
+    "id": "support16",
+    "author": "Customer_Emma",
+    "timestamp": "2026-04-18T11:00:00Z",
+    "text": "Your service is amazing! I've been using it for 2 years and love every feature.",
+    "parentId": null
+  },
+  {
+    "id": "support17",
+    "author": "Support_Agent_Mike",
+    "timestamp": "2026-04-18T11:15:00Z",
+    "text": "Thank you so much for the kind words! We're glad you're enjoying the service. Any suggestions?",
+    "parentId": "support16"
+  },
+  {
+    "id": "support18",
+    "author": "Customer_Emma",
+    "timestamp": "2026-04-18T11:30:00Z",
+    "text": "Maybe add team collaboration features? That would be perfect for our workflow.",
+    "parentId": "support17"
+  },
+  {
+    "id": "support19",
+    "author": "Support_Agent_Mike",
+    "timestamp": "2026-04-18T11:45:00Z",
+    "text": "Great suggestion! I'll pass this to our product team. Thanks for the feedback!",
+    "parentId": "support18"
+  }
+]
