@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Edge } from "@xyflow/react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import UserHeader from "../components/UserHeader";
 import UserFooter from "../components/UserFooter";
 import UserThreadMapView, {
@@ -11,6 +12,7 @@ import UserThreadMapView, {
 import UserChatView from "../components/UserChatView";
 import UserMessageDetailSheet from "../components/UserMessageDetailSheet";
 import TopicDetailSheet from "../components/TopicDetailSheet";
+import TimeSlider from "../components/TimeSlider";
 
 type TimeGranularity = "day" | "week" | "month";
 type ViewMode = "map" | "chat";
@@ -48,6 +50,19 @@ function compareBuckets(a: string, b: string) {
   return a.localeCompare(b);
 }
 
+function formatBucketLabel(bucket: string, granularity: TimeGranularity) {
+  if (granularity === "day") {
+    const [, month, day] = bucket.split("-");
+    return `${month}/${day}`;
+  }
+  if (granularity === "week") {
+    const [, month, day] = bucket.split("-");
+    return `Week ${month}/${day}`;
+  }
+  const [year, month] = bucket.split("-");
+  return `${month}/${year}`;
+}
+
 export default function Page() {
   const [datasetIds, setDatasetIds] = useState<string[]>([]);
   const [selectedDataset, setSelectedDataset] = useState("");
@@ -74,6 +89,7 @@ export default function Page() {
   } | null>(null);
   const [uploadError, setUploadError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -550,37 +566,151 @@ export default function Page() {
     safeSliderLow + 1,
     Math.min(sliderHigh, Math.max(usableTimeBuckets.length, 1))
   );
+  const timeSliderSegments = Math.max(usableTimeBuckets.length, 1);
 
   return (
     <main className="h-dvh bg-[#f3f5f1]">
       <div className="mx-auto flex h-dvh w-full flex-col bg-[#f8faf7]">
-        <UserHeader
-          datasetIds={datasetIds}
-          selectedDataset={selectedDataset}
-          onSelectDataset={setSelectedDataset}
-          timeGranularity={timeGranularity}
-          onChangeGranularity={setTimeGranularity}
-          availableTimeBuckets={availableTimeBuckets}
-          usableTimeBuckets={usableTimeBuckets}
-          sliderLow={safeSliderLow}
-          sliderHigh={safeSliderHigh}
-          onSliderChange={handleSliderChange}
-          availableTopics={availableTopics}
-          selectedTopics={selectedTopics}
-          onToggleTopic={handleToggleTopic}
-          onClearTopics={handleClearTopics}
-          viewMode={viewMode}
-          onChangeViewMode={setViewMode}
-          onFileUpload={handleFileUpload}
-          uploadError={uploadError}
-          uploadSuccess={uploadSuccess}
-        />
+        {!isFullscreen && (
+          <UserHeader
+            datasetIds={datasetIds}
+            selectedDataset={selectedDataset}
+            onSelectDataset={setSelectedDataset}
+            timeGranularity={timeGranularity}
+            onChangeGranularity={setTimeGranularity}
+            availableTimeBuckets={availableTimeBuckets}
+            usableTimeBuckets={usableTimeBuckets}
+            sliderLow={safeSliderLow}
+            sliderHigh={safeSliderHigh}
+            onSliderChange={handleSliderChange}
+            availableTopics={availableTopics}
+            selectedTopics={selectedTopics}
+            onToggleTopic={handleToggleTopic}
+            onClearTopics={handleClearTopics}
+            viewMode={viewMode}
+            onChangeViewMode={setViewMode}
+            onFileUpload={handleFileUpload}
+            uploadError={uploadError}
+            uploadSuccess={uploadSuccess}
+          />
+        )}
 
         <div className="min-h-0 flex-1 overflow-hidden">
           {error ? (
             <div className="p-4 text-sm text-red-700">{error}</div>
+          ) : isFullscreen ? (
+            <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#f8faf7]">
+              <div className="shrink-0 border-b border-[#d4ddd0] bg-[#fafaf8] px-4 py-3">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1 overflow-visible px-1">
+                    <TimeSlider
+                      segments={timeSliderSegments}
+                      low={safeSliderLow}
+                      high={safeSliderHigh}
+                      onChange={handleSliderChange}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsFullscreen(false)}
+                    aria-label="Exit fullscreen"
+                    title="Exit fullscreen"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#A8B89A] bg-[#fafaf8] text-[#3D6B35] shadow-md transition hover:bg-[#eef2eb] active:scale-95"
+                  >
+                    <Minimize2 size={17} strokeWidth={2.2} />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={usableTimeBuckets[safeSliderLow] ?? ""}
+                    onChange={(e) => {
+                      const nextLow = usableTimeBuckets.indexOf(e.target.value);
+                      if (nextLow === -1) return;
+                      const nextHigh = Math.max(safeSliderHigh, nextLow + 1);
+                      handleSliderChange(nextLow, nextHigh);
+                    }}
+                    className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
+                  >
+                    {usableTimeBuckets.map((bucket, index) => (
+                      <option key={bucket} value={bucket} disabled={index >= safeSliderHigh}>
+                        {formatBucketLabel(bucket, timeGranularity)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <span className="text-[11px] font-medium text-[#5C7A4E]">to</span>
+
+                  <select
+                    value={usableTimeBuckets[safeSliderHigh - 1] ?? ""}
+                    onChange={(e) => {
+                      const endIndex = usableTimeBuckets.indexOf(e.target.value);
+                      if (endIndex === -1) return;
+                      const nextHigh = endIndex + 1;
+                      const nextLow = Math.min(safeSliderLow, endIndex);
+                      handleSliderChange(nextLow, nextHigh);
+                    }}
+                    className="rounded-full border border-[#A8B89A] bg-[#eef2eb] px-3 py-1 text-[11px] font-medium text-[#2B3A2B] outline-none"
+                  >
+                    {usableTimeBuckets.map((bucket, index) => (
+                      <option key={bucket} value={bucket} disabled={index < safeSliderLow}>
+                        {formatBucketLabel(bucket, timeGranularity)}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="min-w-0 flex-1 overflow-x-auto overflow-y-hidden">
+                    <div className="flex w-max gap-1.5 px-1">
+                      <button
+                        type="button"
+                        onClick={handleClearTopics}
+                        className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap ${
+                          selectedTopics.length === 0
+                            ? "border-[#3D6B35] bg-[#3D6B35] text-[#f5f8f2]"
+                            : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
+                        }`}
+                      >
+                        All topics
+                      </button>
+                      {availableTopics.map((topic) => (
+                        <button
+                          type="button"
+                          key={topic}
+                          onClick={() => handleToggleTopic(topic)}
+                          className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap ${
+                            selectedTopics.includes(topic)
+                              ? "border-[#3D6B35] bg-[#3D6B35] text-[#f5f8f2]"
+                              : "border-[#A8B89A] bg-transparent text-[#5C7A4E]"
+                          }`}
+                        >
+                          {topic}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-hidden p-2">
+                <UserThreadMapView
+                  nodesData={nodesData}
+                  edgesData={edgesData}
+                  onOpenMessage={openMessage}
+                  onOpenTopic={openTopic}
+                />
+              </div>
+            </div>
           ) : viewMode === "map" ? (
-            <div className="h-full min-h-0 overflow-hidden px-2 py-2">
+            <div className="relative h-full min-h-0 overflow-hidden px-2 py-2">
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(true)}
+                aria-label="Enter fullscreen"
+                title="Enter fullscreen"
+                className="absolute right-5 top-5 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-[#A8B89A] bg-[#fafaf8] text-[#3D6B35] shadow-md transition hover:bg-[#eef2eb] active:scale-95"
+              >
+                <Maximize2 size={17} strokeWidth={2.2} />
+              </button>
               <UserThreadMapView
                 nodesData={nodesData}
                 edgesData={edgesData}
@@ -604,16 +734,18 @@ export default function Page() {
           )}
         </div>
 
-        <div className="shrink-0">
-          <UserFooter
-            messageCount={displayedMessages.length}
-            roots={roots}
-            depth={depth}
-            sentimentStats={sentimentStats}
-            aiSummaries={filteredAiSummaries}
-            loadingAI={loadingAI}
-          />
-        </div>
+        {!isFullscreen && (
+          <div className="shrink-0">
+            <UserFooter
+              messageCount={displayedMessages.length}
+              roots={roots}
+              depth={depth}
+              sentimentStats={sentimentStats}
+              aiSummaries={filteredAiSummaries}
+              loadingAI={loadingAI}
+            />
+          </div>
+        )}
 
         <UserMessageDetailSheet
           selectedMessage={selectedMessage}
