@@ -1,0 +1,93 @@
+[
+  {
+    "id": "soft1",
+    "author": "Team Lead",
+    "timestamp": "2026-04-15T09:00:00Z",
+    "text": "We need to refactor the authentication module. Current implementation has security vulnerabilities.",
+    "parentId": null
+  },
+  {
+    "id": "soft2",
+    "author": "Senior Developer",
+    "timestamp": "2026-04-15T09:30:00Z",
+    "text": "I agree. We should implement OAuth 2.0 and add rate limiting to prevent brute force attacks.",
+    "parentId": "soft1"
+  },
+  {
+    "id": "soft3",
+    "author": "Junior Developer",
+    "timestamp": "2026-04-15T10:00:00Z",
+    "text": "OAuth 2.0 seems overkill for our use case. Can we just strengthen password policies?",
+    "parentId": "soft2"
+  },
+  {
+    "id": "soft4",
+    "author": "Security Officer",
+    "timestamp": "2026-04-15T10:30:00Z",
+    "text": "Password policies alone won't be sufficient. We need multi-factor authentication as well.",
+    "parentId": "soft3"
+  },
+  {
+    "id": "soft5",
+    "author": "Team Lead",
+    "timestamp": "2026-04-15T11:00:00Z",
+    "text": "Let's create a task list and assign it to the security team. They'll review all options.",
+    "parentId": "soft4"
+  },
+  {
+    "id": "soft6",
+    "author": "DevOps Engineer",
+    "timestamp": "2026-04-16T08:00:00Z",
+    "text": "The CI/CD pipeline is failing on the latest commit. Docker image build is timing out.",
+    "parentId": null
+  },
+  {
+    "id": "soft7",
+    "author": "Senior Developer",
+    "timestamp": "2026-04-16T08:30:00Z",
+    "text": "Have you checked the Docker file? We might have too many layers or large dependencies.",
+    "parentId": "soft6"
+  },
+  {
+    "id": "soft8",
+    "author": "DevOps Engineer",
+    "timestamp": "2026-04-16T09:00:00Z",
+    "text": "Just optimized it by removing unnecessary dependencies. Build time reduced from 15min to 3min.",
+    "parentId": "soft7"
+  },
+  {
+    "id": "soft9",
+    "author": "Team Lead",
+    "timestamp": "2026-04-16T09:30:00Z",
+    "text": "Great work! Can you document the optimization steps for future reference?",
+    "parentId": "soft8"
+  },
+  {
+    "id": "soft10",
+    "author": "QA Tester",
+    "timestamp": "2026-04-17T10:00:00Z",
+    "text": "Found critical bugs in the payment module. Transaction processing is failing for certain credit card types.",
+    "parentId": null
+  },
+  {
+    "id": "soft11",
+    "author": "Backend Developer",
+    "timestamp": "2026-04-17T10:30:00Z",
+    "text": "Which card types? We need to test with the payment gateway's sandbox environment.",
+    "parentId": "soft10"
+  },
+  {
+    "id": "soft12",
+    "author": "QA Tester",
+    "timestamp": "2026-04-17T11:00:00Z",
+    "text": "American Express and Discover cards are failing. Visa and Mastercard work fine.",
+    "parentId": "soft11"
+  },
+  {
+    "id": "soft13",
+    "author": "Backend Developer",
+    "timestamp": "2026-04-17T11:30:00Z",
+    "text": "I see the issue. We need to update the gateway configuration to support additional card types.",
+    "parentId": "soft12"
+  }
+]

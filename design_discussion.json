@@ -1,0 +1,93 @@
+[
+  {
+    "id": "design1",
+    "author": "Design Lead",
+    "timestamp": "2026-04-12T10:00:00Z",
+    "text": "We need to update our design system. The current color palette doesn't meet accessibility standards.",
+    "parentId": null
+  },
+  {
+    "id": "design2",
+    "author": "UX Designer",
+    "timestamp": "2026-04-12T10:30:00Z",
+    "text": "I've been working on WCAG AAA compliance. Increasing contrast ratios for all text elements.",
+    "parentId": "design1"
+  },
+  {
+    "id": "design3",
+    "author": "Visual Designer",
+    "timestamp": "2026-04-12T11:00:00Z",
+    "text": "But won't higher contrast ratios make the design look too harsh? We need to maintain aesthetics.",
+    "parentId": "design2"
+  },
+  {
+    "id": "design4",
+    "author": "Accessibility Specialist",
+    "timestamp": "2026-04-12T11:30:00Z",
+    "text": "We can achieve both. Using neutral backgrounds and softer accent colors helps balance accessibility and aesthetics.",
+    "parentId": "design3"
+  },
+  {
+    "id": "design5",
+    "author": "Design Lead",
+    "timestamp": "2026-04-12T12:00:00Z",
+    "text": "Good point. Let's schedule a design review meeting next week to go through the new palette.",
+    "parentId": "design4"
+  },
+  {
+    "id": "design6",
+    "author": "UI Developer",
+    "timestamp": "2026-04-13T09:00:00Z",
+    "text": "The responsive design breakpoints need adjustment. Mobile view is breaking on tablet sizes.",
+    "parentId": null
+  },
+  {
+    "id": "design7",
+    "author": "Senior Developer",
+    "timestamp": "2026-04-13T09:30:00Z",
+    "text": "We should add a tablet breakpoint. Currently we only have mobile and desktop breakpoints.",
+    "parentId": "design6"
+  },
+  {
+    "id": "design8",
+    "author": "UI Developer",
+    "timestamp": "2026-04-13T10:00:00Z",
+    "text": "Great idea. I'll add breakpoints for 768px and 1024px. Should improve mobile experience significantly.",
+    "parentId": "design7"
+  },
+  {
+    "id": "design9",
+    "author": "Product Manager",
+    "timestamp": "2026-04-14T10:00:00Z",
+    "text": "Users are requesting dark mode support. Can we prioritize this feature?",
+    "parentId": null
+  },
+  {
+    "id": "design10",
+    "author": "Design Lead",
+    "timestamp": "2026-04-14T10:30:00Z",
+    "text": "Dark mode would be a great addition. We should create a theme system to make switching seamless.",
+    "parentId": "design9"
+  },
+  {
+    "id": "design11",
+    "author": "Frontend Developer",
+    "timestamp": "2026-04-14T11:00:00Z",
+    "text": "I can implement this using CSS custom properties and a context provider. Storage preference in localStorage.",
+    "parentId": "design10"
+  },
+  {
+    "id": "design12",
+    "author": "Product Manager",
+    "timestamp": "2026-04-14T11:30:00Z",
+    "text": "Perfect! Let's add this to the next sprint. Timeline estimate?",
+    "parentId": "design11"
+  },
+  {
+    "id": "design13",
+    "author": "Frontend Developer",
+    "timestamp": "2026-04-14T12:00:00Z",
+    "text": "About 2-3 days for implementation plus 1 day for testing. So roughly 4 days total.",
+    "parentId": "design12"
+  }
+]
