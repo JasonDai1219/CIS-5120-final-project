@@ -15,6 +15,13 @@ import TopicDetailSheet from "../components/TopicDetailSheet";
 type TimeGranularity = "day" | "week" | "month";
 type ViewMode = "map" | "chat";
 
+type AiSummary = {
+  root_id: string;
+  main_topic: string;
+  summary: string;
+  key_points: string[];
+};
+
 function getDayKey(timestamp: string) {
   return timestamp.slice(0, 10);
 }
@@ -44,17 +51,7 @@ function compareBuckets(a: string, b: string) {
 export default function Page() {
   const [datasetIds, setDatasetIds] = useState<string[]>([]);
   const [selectedDataset, setSelectedDataset] = useState("");
-<<<<<<< Updated upstream
   const [error, setError] = useState("");
-=======
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [aiMessages, setAiMessages] = useState<Message[]>([]);
-  const [aiSummaries, setAiSummaries] = useState<any[]>([]);
-  const [loadingAI, setLoadingAI] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"map" | "chat">("map");
->>>>>>> Stashed changes
   const [timeGranularity, setTimeGranularity] =
     useState<TimeGranularity>("week");
   const [sliderLow, setSliderLow] = useState(0);
@@ -65,6 +62,8 @@ export default function Page() {
   const [topicSummaries, setTopicSummaries] = useState<Record<string, string>>(
     {}
   );
+  const [aiSummaries, setAiSummaries] = useState<AiSummary[]>([]);
+  const [loadingAI, setLoadingAI] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<BaseGraphNode | null>(null);
@@ -73,6 +72,8 @@ export default function Page() {
     start: string;
     end: string;
   } | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState("");
 
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -206,35 +207,13 @@ export default function Page() {
       return d;
     };
 
-<<<<<<< Updated upstream
     return displayedMessages.length
       ? Math.max(...displayedMessages.map(depthOf))
       : 0;
   }, [displayedMessages]);
 
   const sentimentStats = useMemo(() => {
-    const value = (sentiment?: string) => {
-      switch (sentiment) {
-        case "supportive":
-          return 1;
-        case "critical":
-          return -1;
-        default:
-          return 0;
-      }
-    };
-
-    const total = displayedMessages.reduce(
-      (sum, m) => sum + value(m.sentiment),
-      0
-    );
-    const avg = displayedMessages.length ? total / displayedMessages.length : 0;
-
     const supportive = displayedMessages.filter(
-=======
-  const sentimentLine = useMemo(() => {
-    const supportive = topicFilteredMessages.filter(
->>>>>>> Stashed changes
       (m) => m.sentiment === "supportive"
     ).length;
     const neutral = displayedMessages.filter(
@@ -247,9 +226,6 @@ export default function Page() {
 
     const totalCount = supportive + neutral + critical || 1;
 
-    // Calculate average sentiment as a 0-1 scale
-    // Using formula: (supportive - critical + neutral) / (2 * total)
-    // This gives: 1 if all supportive, 0.5 if all neutral, 0 if all critical
     const avg = totalCount > 0
       ? (supportive + neutral * 0.5) / totalCount
       : 0.5;
@@ -358,15 +334,12 @@ export default function Page() {
     return Boolean(msg.replyInferred && msg.inferredReplyToId && !msg.parentId);
   }
 
-  // Filter AI Summaries based on selected topics and time range
   const filteredAiSummaries = useMemo(() => {
     return aiSummaries.filter((summary) => {
-      // Filter by topic: if topics selected, summary must match one of them
       if (selectedTopics.length > 0 && !selectedTopics.includes(summary.main_topic)) {
         return false;
       }
 
-      // Filter by time: if time range selected, root message must be in range
       if (selectedTimeRange) {
         const rootMsg = messagesById[summary.root_id];
         if (!rootMsg) return false;
@@ -382,6 +355,55 @@ export default function Page() {
       return true;
     });
   }, [aiSummaries, selectedTopics, selectedTimeRange, timeGranularity, messagesById]);
+
+  async function handleFileUpload(file: File) {
+    setUploadError("");
+    setUploadSuccess("");
+
+    if (!file.name.endsWith(".json")) {
+      setUploadError("Only .json files are supported.");
+      return;
+    }
+
+    let parsed: unknown;
+    try {
+      const text = await file.text();
+      parsed = JSON.parse(text);
+    } catch {
+      setUploadError("Could not parse file as JSON.");
+      return;
+    }
+
+    if (!Array.isArray(parsed)) {
+      setUploadError("JSON must be an array of messages.");
+      return;
+    }
+
+    const name = file.name.replace(/\.json$/, "");
+
+    try {
+      const res = await fetch("/api/datasets/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, messages: parsed }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setUploadError(data.detail ?? "Upload failed.");
+        return;
+      }
+
+      const newId: string = data.datasetId;
+      setDatasetIds((prev) => (prev.includes(newId) ? prev : [...prev, newId]));
+      setSelectedDataset(newId);
+      setUploadSuccess(
+        `"${newId}" uploaded (${data.messageCount} messages). AI analysis in progress...`
+      );
+    } catch {
+      setUploadError("Upload failed. Is the backend running?");
+    }
+  }
 
   useEffect(() => {
     async function loadDatasets() {
@@ -410,6 +432,12 @@ export default function Page() {
   useEffect(() => {
     if (!selectedDataset) return;
 
+    let cancelled = false;
+
+    setLoadingAI(true);
+    setTopicSummaries({});
+    setAiSummaries([]);
+
     async function loadTopicSummaries() {
       try {
         const res = await fetch(
@@ -420,9 +448,12 @@ export default function Page() {
         }
 
         const data = await res.json();
+        const summaries = Array.isArray(data.summaries)
+          ? (data.summaries as AiSummary[])
+          : [];
 
         const mapped = Object.fromEntries(
-          (data.summaries ?? []).map(
+          summaries.map(
             (item: { root_id: string; summary: string }) => [
               item.root_id,
               item.summary,
@@ -430,14 +461,30 @@ export default function Page() {
           )
         );
 
+        if (cancelled) return;
+
         setTopicSummaries(mapped);
+        setAiSummaries(summaries);
+        setLoadingAI(false);
+        if (summaries.length > 0) {
+          setUploadSuccess("");
+        }
       } catch (err) {
         console.error(err);
-        setTopicSummaries({});
+        if (!cancelled) {
+          setLoadingAI(false);
+        }
       }
     }
 
     loadTopicSummaries();
+
+    const interval = window.setInterval(loadTopicSummaries, 30000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, [selectedDataset]);
 
   useEffect(() => {
@@ -474,70 +521,8 @@ export default function Page() {
       return;
     }
 
-<<<<<<< Updated upstream
     setSliderLow(0);
     setSliderHigh(usableTimeBuckets.length);
-=======
-  // Load AI Summaries
-  useEffect(() => {
-    if (!selectedDataset) return;
-
-    let cancelled = false;
-
-    const loadSummaries = async () => {
-      try {
-        setLoadingAI(true);
-        const res = await fetch(
-          `/api/discussions/${selectedDataset}/messages/ai-summary`
-        );
-        if (!res.ok) {
-          console.warn("[AI Summaries] API returned status:", res.status);
-          setLoadingAI(false);
-          return;
-        }
-
-        const data = await res.json();
-        const summaries = Array.isArray(data.summaries) ? data.summaries : [];
-
-        console.log("[AI Summaries] Loaded", summaries.length, "summaries");
-
-        if (!cancelled) {
-          // Only update if we got actual summaries, don't clear with empty array
-          if (summaries.length > 0) {
-            setAiSummaries(summaries);
-            console.log("[AI Summaries] Updated state with", summaries.length, "summaries");
-          } else {
-            console.warn("[AI Summaries] Received empty summaries array, keeping previous data");
-          }
-          setLoadingAI(false);
-        }
-      } catch (error) {
-        // ignore polling errors
-        console.error("[AI Summaries] Load error:", error);
-        if (!cancelled) {
-          setLoadingAI(false);
-        }
-      }
-    };
-
-    // Load summaries on initial mount
-    loadSummaries();
-    
-    // Poll every 30 seconds, but only if not already loading
-    const interval = window.setInterval(() => {
-      if (!cancelled) {
-        loadSummaries();
-      }
-    }, 30000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, [selectedDataset]);
-
-  useEffect(() => {
->>>>>>> Stashed changes
     setSelectedTimeRange(null);
   }, [usableTimeBuckets]);
 
@@ -586,6 +571,9 @@ export default function Page() {
           onClearTopics={handleClearTopics}
           viewMode={viewMode}
           onChangeViewMode={setViewMode}
+          onFileUpload={handleFileUpload}
+          uploadError={uploadError}
+          uploadSuccess={uploadSuccess}
         />
 
         <div className="min-h-0 flex-1 overflow-hidden">
@@ -622,6 +610,8 @@ export default function Page() {
             roots={roots}
             depth={depth}
             sentimentStats={sentimentStats}
+            aiSummaries={filteredAiSummaries}
+            loadingAI={loadingAI}
           />
         </div>
 
@@ -636,20 +626,10 @@ export default function Page() {
           isAiOnlyReply={isAiOnlyReply}
         />
 
-<<<<<<< Updated upstream
         <TopicDetailSheet
           selectedTopic={selectedTopic}
           sheetOpen={topicSheetOpen}
           onCloseSheet={closeTopicSheet}
-=======
-        <UserFooter
-          messageCount={topicFilteredMessages.length}
-          roots={roots}
-          depth={depth}
-          sentimentStats={sentimentLine}
-          aiSummaries={filteredAiSummaries}
-          loadingAI={loadingAI}
->>>>>>> Stashed changes
         />
       </div>
     </main>

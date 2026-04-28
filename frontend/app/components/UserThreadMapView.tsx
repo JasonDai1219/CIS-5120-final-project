@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -11,11 +11,12 @@ import {
   type Node,
   type NodeProps,
   type NodeTypes,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { AnimatePresence, motion, useMotionValue, animate } from "motion/react";
 import { layoutThreadMap } from "../lib/layoutThreadMap";
-import { User } from "lucide-react";
+import { ChevronsDown, User } from "lucide-react";
 
 export type Message = {
   id: string;
@@ -342,8 +343,26 @@ export default function UserThreadMapView({
 }: Props) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [layoutedVisibleNodes, setLayoutedVisibleNodes] = useState<BaseGraphNode[]>([]);
-  const [anchorNodeId, setAnchorNodeId] = useState<string | null>(null);
+  const flowInstanceRef = useRef<ReactFlowInstance<GraphCardNodeType, Edge> | null>(null);
+  const fitAfterToggleRef = useRef(false);
   
+  const expandableNodeIds = useMemo(
+    () => nodesData.filter((node) => node.hasChildren).map((node) => node.id),
+    [nodesData]
+  );
+
+  const allExpandableNodesExpanded =
+    expandableNodeIds.length > 0 &&
+    expandableNodeIds.every((id) => expandedIds.has(id));
+
+  function toggleAllNodes() {
+    if (expandableNodeIds.length === 0) return;
+
+    fitAfterToggleRef.current = true;
+    setExpandedIds(
+      allExpandableNodesExpanded ? new Set() : new Set(expandableNodeIds)
+    );
+  }
 
   const toggleNode = (id: string) => {
     setExpandedIds((prev) => {
@@ -427,24 +446,16 @@ export default function UserThreadMapView({
     };
   }, [visibleBaseNodes, visibleEdges]);
 
-  // 计算路径上的节点 ID（展开的节点 + 到根节点的祖先路径）
-  const pathNodeIds = useMemo(() => {
-    const pathIds = new Set<string>();
-    
-    // 对每个展开的节点，追踪从它到根节点的路径
-    for (const expandedId of expandedIds) {
-      let currentId: string | null = expandedId;
-      
-      while (currentId !== null) {
-        pathIds.add(currentId);
-        const node = nodeById.get(currentId);
-        if (!node) break;
-        currentId = node.parentId;
-      }
-    }
-    
-    return pathIds;
-  }, [expandedIds, nodeById]);
+  useEffect(() => {
+    if (!fitAfterToggleRef.current || !flowInstanceRef.current) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      flowInstanceRef.current?.fitView({ padding: 0.2, duration: 320 });
+      fitAfterToggleRef.current = false;
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [layoutedVisibleNodes]);
 
   // 计算需要高亮（黑框）的节点ID
   // 只有展开的节点以及从展开节点到根的路径需要黑框
@@ -507,11 +518,31 @@ export default function UserThreadMapView({
   );
 
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
+      <button
+        type="button"
+        onClick={toggleAllNodes}
+        disabled={expandableNodeIds.length === 0}
+        aria-label={allExpandableNodesExpanded ? "Collapse all nodes" : "Expand all nodes"}
+        title={allExpandableNodesExpanded ? "Collapse all nodes" : "Expand all nodes"}
+        className="absolute left-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#A8B89A] bg-[#fafaf8] text-[#3D6B35] shadow-md transition hover:bg-[#eef2eb] disabled:cursor-not-allowed disabled:opacity-45"
+      >
+        <motion.span
+          animate={{ rotate: allExpandableNodesExpanded ? 180 : 0 }}
+          transition={{ duration: 0.18, ease: "easeInOut" }}
+          className="flex"
+        >
+          <ChevronsDown size={17} strokeWidth={2.2} />
+        </motion.span>
+      </button>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        onInit={(instance) => {
+          flowInstanceRef.current = instance;
+        }}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         proOptions={{ hideAttribution: true }}
