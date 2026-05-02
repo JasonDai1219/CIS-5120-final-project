@@ -1,12 +1,12 @@
 # CIS-5120 Final Project: Discussion Thread Analysis Platform
 
-A full-stack application for analyzing threaded discussions with AI-powered annotation and summarization capabilities.
+A full-stack application for analyzing threaded discussions, including optional AI-powered annotation and summarization.
 
 ## 📦 Project Structure
 
 ```
 CIS-5120-final-project/
-├── backend/              ← AI-powered discussion analysis API
+├── backend/              ← FastAPI API (optional AI features)
 │   ├── README.md        # ⭐ Start here for backend docs
 │   ├── AI_SETUP.md
 │   ├── TEST_RESULTS.md
@@ -14,7 +14,7 @@ CIS-5120-final-project/
 │   ├── .env.example
 │   └── app/
 │       ├── main.py
-│       ├── ai_service.py    # ⭐ AI features (Copilot-generated)
+│       ├── ai_service.py
 │       ├── loader.py
 │       ├── parser.py
 │       └── schemas.py
@@ -28,7 +28,7 @@ CIS-5120-final-project/
 
 ## 🚀 Quick Start
 
-### Backend (AI-Powered API)
+### Backend (API)
 
 ```bash
 cd backend
@@ -36,10 +36,11 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --reload
 ```
 
-API available at: **http://localhost:8000**  
+API: **http://localhost:8000**  
 Interactive docs: **http://localhost:8000/docs**
 
-#### With AI Features (Optional)
+#### Enable AI Features (Optional)
+
 ```bash
 # Set up OpenAI API
 cp .env.example .env
@@ -49,7 +50,7 @@ cp .env.example .env
 python -m uvicorn app.main:app --reload
 ```
 
-**See `backend/README.md` for complete backend documentation.**
+See `backend/README.md` and `backend/AI_SETUP.md` for full details.
 
 ### Frontend (Web UI)
 
@@ -59,32 +60,30 @@ npm install
 npm run dev
 ```
 
-UI available at: **http://localhost:3000**
+UI: **http://localhost:3000**
 
 ---
 
 ## ✨ Key Features
 
 ### Backend
-- ✅ **REST API** for discussion data management
-- ✅ **Message Validation** with JSON schema enforcement
-- ✅ **Thread Parsing** - Build hierarchical discussion trees
-- ✅ **AI Annotation** - Auto-generate topic/sentiment labels
-- ✅ **AI Summarization** - Generate thread summaries
-- ✅ **Graceful Fallback** - Works with or without API key
-- ✅ **CORS Support** - Ready for frontend integration
+- ✅ REST API for discussion data management
+- ✅ Message validation with Pydantic schemas
+- ✅ Thread parsing (hierarchical discussion trees)
+- ✅ Optional AI annotation (topic + sentiment)
+- ✅ Optional AI summarization (thread-level summaries)
+- ✅ Graceful fallback when no API key is configured
+- ✅ CORS support for local frontend integration
 
 ### Frontend
-- 🎨 React 19 + Next.js 16
-- 📊 Discussion thread visualization
-- 🌳 Tree/graph layout with @xyflow/react
-- 📝 Interactive message exploration
+- React + Next.js App Router
+- Discussion thread visualization
+- Tree/graph layout with `@xyflow/react`
+- Interactive message exploration
 
 ---
 
 ## 📡 API Overview
-
-### Core Endpoints
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
@@ -92,107 +91,118 @@ UI available at: **http://localhost:3000**
 | `GET` | `/datasets` | List available datasets |
 | `GET` | `/discussions/{id}/messages` | Flat message list |
 | `GET` | `/discussions/{id}/thread` | Hierarchical threads |
-| `GET` | `/discussions/{id}/messages/annotated` | ⭐ AI-annotated messages |
-| `GET` | `/discussions/{id}/ai-summary` | ⭐ AI-generated summaries |
+| `GET` | `/discussions/{id}/messages/annotated` | AI-annotated messages (optional) |
+| `GET` | `/discussions/{id}/ai-summary` | AI-generated summaries (optional) |
 
-**See `backend/README.md` for complete API documentation with examples.**
+Full examples live in `backend/README.md`.
 
 ---
 
-## 🤖 AI Features (NEW!)
+## 🤖 AI Features
 
-### Message Annotation
-Automatically classify each message with:
-- **Topic**: deadline, grading, meeting, participation, logistics, other
-- **Sentiment**: supportive, critical, mixed, neutral
+The backend can optionally use OpenAI’s API to:
+- **Annotate each message** with a topic label (deadline, grading, meeting, participation, logistics, other) and sentiment (supportive, critical, mixed, neutral)
+- **Summarize discussion threads** into a main topic, short summary, and key points
 
-### Thread Summarization
-Generate concise summaries of entire discussion threads with:
-- Main topic inference
-- Summary paragraph
-- Key discussion points
-
-### Smart Caching
-- In-memory caching to avoid repeated API calls
-- Graceful fallback when API unavailable
-
-**See `backend/AI_SETUP.md` for detailed AI setup instructions.**
+If no API key is configured, the system still works:
+- annotation returns `"unknown"` labels
+- summarization returns a simple template-based fallback
 
 ---
 
 ## 🧪 Testing
 
-### Backend Tests
 ```bash
 cd backend
 ./test_ai_comprehensive.sh
 ```
 
-**See `backend/TEST_RESULTS.md` for test results.**
+See `backend/TEST_RESULTS.md` for test results.
 
 ---
 
 ## 🛠️ Technology Stack
 
 ### Backend
-- **FastAPI 0.115.12** - Modern async Python web framework
-- **Pydantic 2.11.3** - Data validation
-- **OpenAI 1.63.0** - AI API (optional)
-- **python-dotenv** - Environment config
+- FastAPI
+- Pydantic
+- OpenAI Python SDK (optional)
+- python-dotenv
 
 ### Frontend
-- **Next.js 16.2** - React framework
-- **React 19** - UI library
-- **@xyflow/react 12** - Graph visualization
-- **Tailwind CSS 4** - Styling
+- Next.js
+- React
+- @xyflow/react
+- Tailwind CSS
 
 ---
 
-## 📝 Code Attribution
+## 📝 Attribution & Extent of AI Use
 
-### AI-Generated Components
-This project leverages **GitHub Copilot** for code generation:
+This section is intended to be **more informative than a simple list of tools**. It describes (1) where AI assistance was used, (2) how much of the codebase it affected, and (3) what was still done manually.
 
-**Backend AI Service** (`backend/app/ai_service.py`):
-- ✨ LLM integration with OpenAI API
-- ✨ Message annotation logic
-- ✨ Thread summarization
-- ✨ Caching and fallback handling
-- ✨ Comprehensive error handling
+### What AI was used for
 
-**New Endpoints** (`backend/app/main.py`):
-- ✨ `/messages/annotated` endpoint
-- ✨ `/ai-summary` endpoint
+During development, GitHub Copilot was used primarily in two ways:
 
-**Test & Documentation**:
-- ✨ Comprehensive test scripts
-- ✨ Setup guides (`AI_SETUP.md`)
-- ✨ Test results documentation
+1. **Code drafting / scaffolding**
+   - generating first-pass implementations for new modules and endpoints
+   - suggesting boilerplate for FastAPI routes, request/response typing, and error handling
 
-### Human-Created Components
-Original modules:
-- 👤 `backend/app/loader.py` - Data loading
-- 👤 `backend/app/parser.py` - Thread parsing
-- 👤 `backend/app/schemas.py` - Data models
-- 👤 Frontend application structure
+2. **Iterative edits**
+   - refactoring and reorganizing code (e.g., helper functions, formatting)
+   - producing test scripts and documentation drafts that were then edited for correctness
 
-### Development Process
-- **IDE**: VS Code with GitHub Copilot
-- **AI Assistant**: GitHub Copilot (GPT-4o-mini)
-- **Development Approach**: Iterative prompting with human oversight
+### Where AI-assisted code lives (high-impact areas)
+
+AI assistance was concentrated in the “AI features” portion of the backend:
+
+- `backend/app/ai_service.py`
+  - OpenAI client integration
+  - prompt construction for annotation + summarization
+  - caching and fallback logic
+  - error handling around API failures
+
+- `backend/app/main.py`
+  - the newer AI-related endpoints:
+    - `GET /discussions/{dataset_id}/messages/annotated`
+    - `GET /discussions/{dataset_id}/ai-summary`
+
+- Testing + docs
+  - shell scripts under `backend/` (e.g., `test_ai_comprehensive.sh`)
+  - documentation files such as `backend/AI_SETUP.md` and `backend/TEST_RESULTS.md`
+
+### Approximate extent / effect on the codebase
+
+- **Most non-AI core backend logic** (dataset loading, schema validation, thread parsing) was written manually and then lightly edited with Copilot suggestions.
+- **Most AI feature code paths** (LLM calls, prompt/JSON parsing, fallbacks, AI endpoints, AI-related tests/docs) were drafted with Copilot and then reviewed and revised by the author.
+
+Given the repo’s purpose and language mix, AI assistance disproportionately affected:
+- the **backend’s AI-specific modules and endpoints**, and
+- the **documentation and test harness** around those features,
+
+while the foundational parsing/validation logic and overall project structure were authored directly.
+
+### How AI output was verified
+
+AI-generated drafts were treated as a starting point and then validated by:
+- running the test scripts in `backend/`
+- manual endpoint testing with `curl` against `/docs`
+- reviewing fallback behavior by running without an API key
+
+### Tools
+
+- **GitHub Copilot** (in VS Code) for drafting and iterative edits
+- **OpenAI API** for runtime annotation/summarization (optional feature), configured via `.env`
 
 ---
 
 ## 📖 Documentation
 
-### For Backend Development
-1. **Getting Started**: `backend/README.md`
-2. **AI Setup**: `backend/AI_SETUP.md`
-3. **Testing**: `backend/TEST_RESULTS.md`
-4. **Interactive API Docs**: http://localhost:8000/docs
-
-### For Frontend Development
-See `frontend/README.md`
+- Backend docs: `backend/README.md`
+- AI setup: `backend/AI_SETUP.md`
+- Testing: `backend/TEST_RESULTS.md`
+- Frontend docs: `frontend/README.md`
 
 ---
 
@@ -227,30 +237,13 @@ See `backend/README.md` for full schema documentation.
 
 ---
 
-## 💡 Next Steps
-
-1. **Backend**: Add your OpenAI API key to `backend/.env`
-2. **Test**: Run `backend/test_ai_comprehensive.sh`
-3. **Frontend**: Connect UI to backend endpoints
-4. **Deploy**: Consider production deployment options
-
----
-
-## 📞 Support
-
-- **Backend Issues**: See `backend/README.md` and `backend/AI_SETUP.md`
-- **API Documentation**: http://localhost:8000/docs (when running)
-- **Test Verification**: See `backend/TEST_RESULTS.md`
-
----
-
 ## 📄 Project Info
 
-- **Course**: CIS 5120 (University of Pennsylvania)
-- **Type**: Final Project
-- **Status**: ✅ MVP Complete with AI Features
-- **Last Updated**: April 2026
+- Course: CIS 5120 (University of Pennsylvania)
+- Type: Final Project
+- Status: MVP complete with optional AI features
+- Last Updated: 2026-05-02 17:26:28
 
 ---
 
-**Ready to analyze discussions with AI? Start with `backend/README.md`! 🚀**
+Ready to analyze discussions? Start with `backend/README.md`.
